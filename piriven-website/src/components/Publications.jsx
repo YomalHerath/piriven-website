@@ -1,0 +1,119 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import T from '@/components/T';
+import { fetchBooks, mediaUrl } from '@/lib/api';
+
+export default function PublicationsSection() {
+  const [items, setItems] = useState([]);
+  const [err, setErr] = useState('');
+  const [usedFallback, setUsedFallback] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        let list = await fetchBooks({ featured: 'true', active: 'true' });
+        if (!list?.length) {
+          list = await fetchBooks({ active: 'true', ordering: '-published_at' });
+          setUsedFallback(true);
+        }
+        setItems((list || []).slice(0, 2)); // keep the original two-card layout
+      } catch (e) {
+        setErr(e?.message || 'Failed to load publications');
+      }
+    })();
+  }, []);
+
+  if (err) {
+    return (
+      <section className="mt-0">
+        <h2 className="text-4xl font-bold text-gray-800 mb-2">
+          <T>Latest Publications</T>
+        </h2>
+        <div className="text-red-600 text-sm">Error: {err}</div>
+      </section>
+    );
+  }
+
+  if (!items.length) {
+    return (
+      <section className="mt-0">
+        <h2 className="text-4xl font-bold text-gray-800 mb-2">
+          <T>Latest Publications</T>
+        </h2>
+        <p className="text-sm text-neutral-600"><T>No publications yet.</T></p>
+      </section>
+    );
+  }
+
+  return (
+    // Remove big vertical margins so it doesn't drop lower
+    <section className="mt-0 mb-0">
+      <h2 className="text-4xl font-bold text-gray-800 mb-6">
+        <T>Latest Publications</T>{' '}
+        {usedFallback ? (
+          <span className="align-middle text-sm font-normal text-neutral-500">
+            (<T>Latest</T>)
+          </span>
+        ) : null}
+      </h2>
+
+      {/* Exact same layout: column on mobile, row on md+ */}
+      <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6">
+        {items.map((book) => {
+          const cover = mediaUrl(book?.cover);
+          const href = book?.external_url || mediaUrl(book?.pdf_file) || '#';
+          const isExternal = Boolean(book?.external_url);
+          const subtitle = [book?.subtitle, book?.authors, book?.year].filter(Boolean).join(' • ');
+
+          return (
+            <div key={book?.id} className="w-full">
+              <a
+                href={href}
+                target={isExternal ? '_blank' : '_self'}
+                rel={isExternal ? 'noreferrer' : undefined}
+                className="group block w-full overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-neutral-800"
+              >
+                <div className="relative w-full aspect-[3/4]">
+                  {cover ? (
+                    <img
+                      src={cover}
+                      alt={book?.title || 'Publication'}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-neutral-200" />
+                  )}
+
+                  {/* gradient overlay (hidden -> visible on hover) */}
+                  <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+                  {/* Hover content: title, subtitle, CTA */}
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 p-4 md:p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="space-y-1">
+                      <h3 className="text-white text-base md:text-lg font-semibold leading-snug line-clamp-2 drop-shadow">
+                        {book?.title || <T>Untitled</T>}
+                      </h3>
+                      {subtitle ? (
+                        <p className="text-white/90 text-xs md:text-sm line-clamp-1">{subtitle}</p>
+                      ) : null}
+
+                      <div className="mt-2">
+                        <span className="inline-block rounded-xl bg-black/50 backdrop-blur-sm px-3 py-1 text-[11px] md:text-xs text-white">
+                          <T>View publication</T>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+export { PublicationsSection };
