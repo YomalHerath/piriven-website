@@ -1,5 +1,7 @@
 ﻿from django.contrib import admin
 from django.utils.html import format_html
+from django import forms
+from django.db import models as django_models
 from . import models
 
 
@@ -146,6 +148,15 @@ class ExternalLinkAdmin(admin.ModelAdmin):
     fields = ("name", "name_si", "url", "position")
 
 
+@admin.register(models.FooterLink)
+class FooterLinkAdmin(admin.ModelAdmin):
+    list_display = ("name", "url", "position", "is_active")
+    list_editable = ("position", "is_active")
+    search_fields = ("name", "name_si")
+    list_filter = ("is_active",)
+    fields = ("name", "name_si", "url", "position", "is_active")
+
+
 class PublicationInline(admin.TabularInline):
     model = models.Publication
     fields = ("title", "title_si", "file", "external_url", "published_at", "is_active")
@@ -170,11 +181,12 @@ class HeroSlideAdmin(admin.ModelAdmin):
 
     list_display = ("title", "position", "created_at", "image_preview")
     list_editable = ("position",)
-    search_fields = ("title", "title_si", "subtitle", "subtitle_si", "button_label", "button_label_si")
+    search_fields = ("title", "title_si", "subtitle", "subtitle_si")
     readonly_fields = ("created_at", "updated_at")
+    exclude = ("button_label", "button_label_si", "button_url")
     fieldsets = (
-        ("English", {"fields": ("title", "subtitle", "button_label", "button_url")}),
-        ("Sinhala", {"fields": ("title_si", "subtitle_si", "button_label_si")}),
+        ("English", {"fields": ("title", "subtitle")}),
+        ("Sinhala", {"fields": ("title_si", "subtitle_si")}),
         ("Media", {"fields": ("image",)}),
         ("Ordering", {"fields": ("position",)}),
         ("Meta", {"fields": ("created_at", "updated_at")}),
@@ -198,21 +210,129 @@ class ContactMessageAdmin(admin.ModelAdmin):
 @admin.register(models.ContactInfo)
 class ContactInfoAdmin(admin.ModelAdmin):
     list_display = ("organization", "phone", "email", "created_at")
+    search_fields = ("organization", "organization_si", "address", "address_si")
     readonly_fields = ("created_at", "updated_at")
-    fields = (
-        "organization",
-        "organization_si",
-        "phone",
-        "email",
-        "address",
-        "address_si",
-        "map_url",
-        "map_embed",
-        "created_at",
-        "updated_at",
+    formfield_overrides = {
+        django_models.DecimalField: {"widget": forms.NumberInput(attrs={"step": "0.000001"})},
+    }
+    fieldsets = (
+        (None, {"fields": ("organization", "organization_si")}),
+        ("Contact", {"fields": ("phone", "email", "address", "address_si")}),
+        (
+            "Map",
+            {
+                "fields": (
+                    "map_url",
+                    "map_embed",
+                    "latitude",
+                    "longitude",
+                    "map_zoom",
+                )
+            },
+        ),
+        ("System", {"fields": ("created_at", "updated_at")}),
     )
 
     def has_add_permission(self, request):
         if models.ContactInfo.objects.exists():
             return False
         return super().has_add_permission(request)
+
+
+@admin.register(models.FooterAbout)
+class FooterAboutAdmin(admin.ModelAdmin):
+    list_display = ("title", "is_active", "updated_at")
+    list_filter = ("is_active",)
+    search_fields = ("title", "title_si", "body", "body_si")
+    readonly_fields = ("created_at", "updated_at")
+    fieldsets = (
+        ("English", {"fields": ("title", "body")}),
+        ("Sinhala", {"fields": ("title_si", "body_si")}),
+        ("Meta", {"fields": ("is_active", "created_at", "updated_at")}),
+    )
+
+
+
+
+class LibraryPublicationImageInline(admin.TabularInline):
+    model = models.LibraryPublicationImage
+    extra = 1
+
+
+@admin.register(models.LibraryPublicationCategory)
+class LibraryPublicationCategoryAdmin(admin.ModelAdmin):
+    list_display = ("name", "position", "created_at")
+    list_editable = ("position",)
+    search_fields = ("name", "name_si", "description", "description_si")
+    readonly_fields = ("created_at", "updated_at")
+    prepopulated_fields = {"slug": ("name",)}
+    fieldsets = (
+        ("English", {"fields": ("name", "description")}),
+        ("Sinhala", {"fields": ("name_si", "description_si")}),
+        ("Ordering", {"fields": ("position",)}),
+        ("System", {"fields": ("slug", "created_at", "updated_at")}),
+    )
+
+
+@admin.register(models.LibraryPublicationEntry)
+class LibraryPublicationEntryAdmin(admin.ModelAdmin):
+    list_display = ("title", "category", "year", "published_at", "is_active", "is_featured")
+    list_filter = ("is_active", "is_featured", "category", "year")
+    search_fields = ("title", "title_si", "subtitle", "subtitle_si", "authors", "authors_si", "description", "description_si")
+    readonly_fields = ("created_at", "updated_at")
+    inlines = [LibraryPublicationImageInline]
+    fieldsets = (
+        ("English", {"fields": ("category", "title", "subtitle", "authors", "year", "description")}),
+        ("Sinhala", {"fields": ("title_si", "subtitle_si", "authors_si", "description_si")}),
+        ("Media", {"fields": ("cover", "pdf_file", "external_url")}),
+        ("Status & Dates", {"fields": ("published_at", "is_active", "is_featured")}),
+        ("System", {"fields": ("created_at", "updated_at")}),
+    )
+@admin.register(models.HeroIntro)
+class HeroIntroAdmin(admin.ModelAdmin):
+    list_display = ("heading", "highlight", "is_active", "updated_at")
+    list_filter = ("is_active",)
+    search_fields = ("heading", "highlight")
+    readonly_fields = ("created_at", "updated_at")
+    fieldsets = (
+        ("English", {"fields": ("heading", "highlight", "description", "primary_label", "secondary_label")}),
+        ("Sinhala", {"fields": ("heading_si", "highlight_si", "description_si", "primary_label_si", "secondary_label_si")}),
+        ("Links", {"fields": ("primary_url", "secondary_url")}),
+        ("Status", {"fields": ("is_active", "created_at", "updated_at")}),
+    )
+
+
+@admin.register(models.AboutSection)
+class AboutSectionAdmin(admin.ModelAdmin):
+    list_display = ("nav_label", "title", "position", "is_active")
+    list_editable = ("position", "is_active")
+    list_filter = ("is_active",)
+    search_fields = ("nav_label", "title", "body")
+    prepopulated_fields = {"slug": ("nav_label",)}
+    readonly_fields = ("created_at", "updated_at")
+    fieldsets = (
+        ("Menu label", {"fields": ("nav_label", "nav_label_si", "slug", "position", "is_active")}),
+        ("Content", {"fields": ("title", "title_si", "body", "body_si")}),
+        ("System", {"fields": ("created_at", "updated_at")}),
+    )
+
+
+@admin.register(models.SiteTextSnippet)
+class SiteTextSnippetAdmin(admin.ModelAdmin):
+    list_display = ("key", "title", "is_active", "updated_at")
+    list_filter = ("is_active",)
+    search_fields = ("key", "title", "text")
+    readonly_fields = ("created_at", "updated_at")
+    fieldsets = (
+        (None, {"fields": ("key", "title", "notes", "is_active")}),
+        ("English", {"fields": ("text",)}),
+        ("Sinhala", {"fields": ("text_si",)}),
+        ("System", {"fields": ("created_at", "updated_at")}),
+    )
+
+
+
+
+
+
+

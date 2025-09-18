@@ -108,3 +108,94 @@ class ContactInfoSerializer(serializers.ModelSerializer):
         model = models.ContactInfo
         fields = "__all__"
 
+
+class FooterAboutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.FooterAbout
+        fields = "__all__"
+
+
+class FooterLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.FooterLink
+        fields = "__all__"
+
+
+class HeroIntroSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.HeroIntro
+        fields = "__all__"
+
+
+class AboutSectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.AboutSection
+        fields = [
+            "id", "slug", "nav_label", "nav_label_si", "title", "title_si",
+            "body", "body_si", "position", "is_active", "created_at", "updated_at",
+        ]
+
+
+class SiteTextSnippetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.SiteTextSnippet
+        fields = [
+            "id", "key", "title", "text", "text_si", "notes", "is_active",
+            "created_at", "updated_at",
+        ]
+
+
+class LibraryPublicationImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.LibraryPublicationImage
+        fields = ["id", "image", "caption", "caption_si", "created_at", "updated_at"]
+
+
+class LibraryPublicationCategoryMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.LibraryPublicationCategory
+        fields = ["id", "name", "name_si", "slug"]
+
+
+class LibraryPublicationEntrySerializer(serializers.ModelSerializer):
+    category = LibraryPublicationCategoryMiniSerializer(read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.LibraryPublicationCategory.objects.all(),
+        source="category",
+        write_only=True,
+        required=False,
+        allow_null=True,
+    )
+    images = LibraryPublicationImageSerializer(many=True, read_only=True)
+    download_href = serializers.ReadOnlyField()
+
+    class Meta:
+        model = models.LibraryPublicationEntry
+        fields = [
+            "id",
+            "category", "category_id",
+            "title", "title_si", "subtitle", "subtitle_si", "authors", "authors_si", "year", "description", "description_si",
+            "cover", "pdf_file", "external_url", "download_href",
+            "published_at", "is_active", "is_featured",
+            "images",
+            "created_at", "updated_at",
+        ]
+
+
+class LibraryPublicationCategorySerializer(serializers.ModelSerializer):
+    publications_count = serializers.IntegerField(source="publications.count", read_only=True)
+
+    class Meta:
+        model = models.LibraryPublicationCategory
+        fields = [
+            "id",
+            "name", "name_si",
+            "slug",
+            "description", "description_si",
+            "position",
+            "created_at",
+            "updated_at",
+            "publications_count",
+        ]
+
+

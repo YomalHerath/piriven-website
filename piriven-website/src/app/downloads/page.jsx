@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
@@ -15,7 +15,10 @@ const DownloadsPage = () => {
   const [categories, setCategories] = useState([]);
   const [sectionsVisible, setSectionsVisible] = useState({});
 
-  const documents = categories.map((c) => c.name);
+  const documents = categories.map((c, idx) => ({
+    id: c.id ?? c.slug ?? `${c.name}-${idx}`,
+    name: c.name,
+  }));
 
   // 🆕 Add the useEffect hook for IntersectionObserver
   useEffect(() => {
@@ -79,16 +82,16 @@ const DownloadsPage = () => {
             <nav className="flex flex-col space-y-2">
               {documents.map((doc, index) => (
                 <button
-                  key={doc}
-                  onClick={() => setSelectedDoc(doc)}
+                  key={doc.id ?? doc.name ?? index}
+                  onClick={() => setSelectedDoc(doc.name)}
                   className={`relative flex items-center justify-start w-full px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-300 transform ${
-                    selectedDoc === doc
+                    selectedDoc === doc.name
                       ? 'text-red-800 font-extrabold scale-105'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <span className="flex-grow text-left">{doc}</span>
-                  {selectedDoc === doc && (
+                  <span className="flex-grow text-left">{doc.name}</span>
+                  {selectedDoc === doc.name && (
                     <span className="absolute bottom-0 left-0 h-0.5 bg-red-800 w-full animate-underline-grow"></span>
                   )}
                 </button>
@@ -128,7 +131,7 @@ const DownloadsPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {(categories.find((c) => c.name === selectedDoc)?.publications || []).map((pdf, index) => (
                 <div 
-                  key={pdf.name} 
+                  key={pdf.id ?? pdf.title ?? index} 
                   className="group bg-white rounded-lg shadow-lg hover:shadow-lg transition-all duration-500 hover:-translate-y-3 border border-gray-200 hover:border-gray-300 overflow-hidden animate-fade-in-up"
                   style={{
                     animationDelay: `${index * 100}ms`,
@@ -284,3 +287,5 @@ const DownloadsPage = () => {
 };
 
 export default DownloadsPage;
+
+

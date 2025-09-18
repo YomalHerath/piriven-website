@@ -1,4 +1,4 @@
-﻿import os
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,7 +30,6 @@ INSTALLED_APPS = [
 
     # Local apps
     "apps.content",
-    "apps.library",
 ]
 
 # ==== Middleware ====
@@ -124,12 +123,12 @@ CSRF_TRUSTED_ORIGINS = [
 # ==== Jazzmin Admin customization ====
 JAZZMIN_SETTINGS = {
     "site_title": "Piriven Admin",
-    "site_header": "Piriven Website Administration",
+    "site_header": "Piriven Admin",
     "site_brand": "Piriven",
     "welcome_sign": "Site Content Management",
     # Branding graphics (paths are relative to STATIC_URL)
-    "site_logo": "brand/logo.svg",
-    "site_icon": "brand/logo.svg",
+    "site_logo": "brand/logo_icon.png",
+    "site_icon": "brand/logo_icon.png",
     "copyright": "",
     "search_model": "content.News",
     "show_ui_builder": False,
@@ -148,7 +147,7 @@ JAZZMIN_SETTINGS = {
         "content.GalleryImage": "far fa-image",
         "content.News": "far fa-newspaper",
         "content.Notice": "fas fa-bullhorn",
-        "content.Publication": "fas fa-file-pdf",
+        "content.Publication": "fas fa-download",
         "content.DownloadCategory": "fas fa-folder-open",
         "content.Video": "fas fa-video",
         "content.Event": "far fa-calendar-alt",
@@ -195,5 +194,6 @@ JAZZMIN_UI_TWEAKS = {
         "danger": "btn btn-outline-danger",
     },
 }
+
 
 

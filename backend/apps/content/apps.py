@@ -8,6 +8,6 @@ class ContentConfig(AppConfig):
 
     def ready(self):
         from django.contrib import admin
-        admin.site.site_header = "Piriven Website Administration"
+        admin.site.site_header = "Admin Dashboard"
         admin.site.site_title = "Piriven Admin"
         admin.site.index_title = "Site Content Management"

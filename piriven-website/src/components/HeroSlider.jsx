@@ -150,41 +150,6 @@ export const HeroSlider = ({ mainSlides, currentSlide, setCurrentSlide }) => {
                     </p>
                   </div>
                   
-                  {/* Call-to-Action Buttons */}
-                  <div className="overflow-hidden">
-                    <div 
-                      className={`flex flex-col sm:flex-row gap-4 transition-all duration-1000 ease-out ${
-                        isActive 
-                          ? 'transform translate-y-0 opacity-100' 
-                          : 'transform translate-y-10 opacity-0'
-                      }`}
-                      style={{
-                        transitionDelay: isActive ? '700ms' : '0ms',
-                        transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)'
-                      }}
-                    >
-                      {/* Primary Government Button */}
-                      <a 
-                        href={slide.button_url || '#'}
-                        className="group relative inline-block overflow-hidden bg-red-700 hover:bg-red-800 text-white px-10 py-4 rounded-full font-semibold text-lg transition-all duration-300 ease-out transform focus:outline-none focus:ring-4 focus:ring-red-500/30 hover:shadow-xl hover:shadow-red-900/30 active:scale-95"
-                      >
-                        {/* Shimmer Effect */}
-                        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-800"></span>
-                        
-                        <span className="relative flex items-center gap-2 group-hover:translate-x-1 transition-transform duration-300">
-                          {slide.button_label || 'Discover More'}
-                          <svg 
-                            className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            viewBox="0 0 24 24"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                          </svg>
-                        </span>
-                      </a>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

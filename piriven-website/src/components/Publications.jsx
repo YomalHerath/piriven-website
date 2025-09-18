@@ -1,5 +1,6 @@
 ﻿'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import T from '@/components/T';
 import { fetchBooks, mediaUrl } from '@/lib/api';
@@ -121,10 +122,22 @@ export default function PublicationsSection() {
           );
         })}
       </div>
+
+      <div className="mt-6 text-right">
+        <Link
+          href="/publications"
+          className="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800"
+        >
+          <T>Browse all publications</T>
+        </Link>
+      </div>
     </section>
   );
 }
 
 export { PublicationsSection };
+
+
+
 
 

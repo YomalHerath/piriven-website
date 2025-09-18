@@ -64,6 +64,10 @@ class Publication(TimeStamped):
     cover = models.ImageField(upload_to="publication_covers", blank=True, null=True)
     # Category is added below via DownloadCategory foreign key once the model is declared
 
+    class Meta:
+        verbose_name = "Downloadable file"
+        verbose_name_plural = "Downloadable files"
+
     def __str__(self):
         return self.title
 
@@ -136,7 +140,7 @@ class GalleryImage(TimeStamped):
         ordering = ["position", "created_at"]
 
     def __str__(self):
-        return f"{self.album.title} • {self.caption or self.image.name}"
+        return f"{self.album.title} - {self.caption or self.image.name}"
 
 
 class Event(TimeStamped):
@@ -169,6 +173,22 @@ class ExternalLink(TimeStamped):
 
     class Meta:
         ordering = ["position", "name"]
+
+    def __str__(self):
+        return self.name
+
+
+class FooterLink(TimeStamped):
+    name = models.CharField(max_length=255)
+    name_si = models.CharField(max_length=255, blank=True)
+    url = models.URLField()
+    position = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["position", "name"]
+        verbose_name = "Footer link"
+        verbose_name_plural = "Footer links"
 
     def __str__(self):
         return self.name
@@ -226,6 +246,152 @@ Publication.add_to_class(
 )
 
 
+
+
+
+
+class LibraryPublicationCategory(TimeStamped):
+    name = models.CharField(max_length=200, unique=True)
+    name_si = models.CharField(max_length=200, blank=True)
+    slug = models.SlugField(max_length=220, unique=True, blank=True)
+    description = models.TextField(blank=True)
+    description_si = models.TextField(blank=True)
+    position = models.PositiveIntegerField(default=0, help_text="Order categories by this field (ascending).")
+
+    class Meta:
+        ordering = ["position", "name"]
+        verbose_name = "Book category"
+        verbose_name_plural = "Book categories"
+        db_table = "library_publicationcategory"
+        managed = False
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)[:220]
+        super().save(*args, **kwargs)
+
+
+class LibraryPublicationEntry(TimeStamped):
+    category = models.ForeignKey("LibraryPublicationCategory", on_delete=models.SET_NULL, null=True, blank=True, related_name="publications")
+    title = models.CharField(max_length=255)
+    title_si = models.CharField(max_length=255, blank=True)
+    subtitle = models.CharField(max_length=255, blank=True)
+    subtitle_si = models.CharField(max_length=255, blank=True)
+    authors = models.CharField(max_length=255, blank=True, help_text="Comma-separated author names")
+    authors_si = models.CharField(max_length=255, blank=True, help_text="Sinhala author names (optional)")
+    year = models.PositiveIntegerField(null=True, blank=True)
+    description = models.TextField(blank=True)
+    description_si = models.TextField(blank=True)
+
+    cover = models.ImageField(upload_to="publication_covers/", blank=True, null=True)
+    pdf_file = models.FileField(upload_to="publications/", blank=True, null=True, help_text="Optional PDF for the book")
+    external_url = models.URLField(blank=True, help_text="If provided, link to this instead of pdf_file")
+
+    published_at = models.DateField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False, help_text="Show in homepage Publications section")
+
+    class Meta:
+        ordering = ["-published_at", "-created_at"]
+        verbose_name = "Book (Library)"
+        verbose_name_plural = "Books (Library)"
+        db_table = "library_publicationentry"
+        managed = False
+
+    def clean(self):
+        if not self.pdf_file and not self.external_url:
+            raise ValidationError("Upload a PDF file or provide an external URL.")
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def download_href(self) -> str:
+        if self.external_url:
+            return self.external_url
+        return self.pdf_file.url if self.pdf_file else ""
+
+
+class LibraryPublicationImage(TimeStamped):
+    publication = models.ForeignKey("LibraryPublicationEntry", on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to="publication_images/")
+    caption = models.CharField(max_length=255, blank=True)
+    caption_si = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        ordering = ["created_at"]
+        verbose_name = "Publication Image"
+        verbose_name_plural = "Publication Images"
+        db_table = "library_publicationimage"
+        managed = False
+
+    def __str__(self):
+        return f"Image for {self.publication.title}"
+
+
+class HeroIntro(TimeStamped):
+    heading = models.CharField(max_length=255, blank=True)
+    heading_si = models.CharField(max_length=255, blank=True)
+    highlight = models.CharField(max_length=255, blank=True)
+    highlight_si = models.CharField(max_length=255, blank=True)
+    description = models.TextField(blank=True)
+    description_si = models.TextField(blank=True)
+    primary_label = models.CharField(max_length=120, blank=True)
+    primary_label_si = models.CharField(max_length=120, blank=True)
+    primary_url = models.URLField(blank=True)
+    secondary_label = models.CharField(max_length=120, blank=True)
+    secondary_label_si = models.CharField(max_length=120, blank=True)
+    secondary_url = models.URLField(blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Hero intro"
+        verbose_name_plural = "Hero intro"
+
+    def __str__(self):
+        return self.heading or "Hero intro"
+
+
+class AboutSection(TimeStamped):
+    slug = models.SlugField(max_length=160, unique=True)
+    nav_label = models.CharField(max_length=255)
+    nav_label_si = models.CharField(max_length=255, blank=True)
+    title = models.CharField(max_length=255)
+    title_si = models.CharField(max_length=255, blank=True)
+    body = models.TextField(blank=True)
+    body_si = models.TextField(blank=True)
+    position = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["position", "nav_label"]
+        verbose_name = "About section"
+        verbose_name_plural = "About sections"
+
+    def __str__(self):
+        return self.nav_label
+
+
+class SiteTextSnippet(TimeStamped):
+    key = models.CharField(max_length=150, unique=True)
+    title = models.CharField(max_length=255, blank=True)
+    text = models.TextField(blank=True)
+    text_si = models.TextField(blank=True)
+    notes = models.CharField(max_length=255, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["key"]
+        verbose_name = "Site text snippet"
+        verbose_name_plural = "Site text snippets"
+
+    def __str__(self):
+        return self.title or self.key
+
+
 class ContactMessage(TimeStamped):
     name = models.CharField(max_length=255)
     email = models.EmailField()
@@ -249,6 +415,24 @@ class ContactInfo(TimeStamped):
     address_si = models.TextField(blank=True)
     map_url = models.URLField(blank=True, help_text="Google Maps embed URL or share link")
     map_embed = models.TextField(blank=True, help_text="Optional full <iframe> code for the map")
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        blank=True,
+        null=True,
+        help_text="Decimal latitude (e.g. 7.290572)",
+    )
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        blank=True,
+        null=True,
+        help_text="Decimal longitude (e.g. 80.633728)",
+    )
+    map_zoom = models.PositiveSmallIntegerField(
+        default=15,
+        help_text="Map zoom level for embeds (1-20)",
+    )
 
     class Meta:
         verbose_name = "Contact information"
@@ -256,3 +440,29 @@ class ContactInfo(TimeStamped):
 
     def __str__(self):
         return self.organization or "Contact Info"
+
+
+class FooterAbout(TimeStamped):
+    title = models.CharField(max_length=255, blank=True)
+    title_si = models.CharField(max_length=255, blank=True)
+    body = models.TextField(blank=True)
+    body_si = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["-updated_at", "-created_at"]
+        verbose_name = "Footer about"
+        verbose_name_plural = "Footer about"
+
+    def __str__(self):
+        return self.title or "Footer about"
+
+
+
+
+
+
+
+
+
+

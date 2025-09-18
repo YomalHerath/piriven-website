@@ -1,8 +1,7 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import T from '@/components/T';
 
 import { ChevronLeft, ChevronRight, BookOpen, Users, GraduationCap, Search, Link as LinkIcon } from 'lucide-react';
 import { Header } from './Header';
@@ -19,7 +18,8 @@ import { PublicationsSection } from './Publications';
 import { VideosSection } from './Videos';
 import { NewsletterSection } from './NewsLetter';
 import { Footer } from './Footer';
-import { fetchSlides, fetchNews, fetchNotices, fetchEvents, fetchVideos, fetchStats, fetchLinks, fetchAlbums, mediaUrl } from '@/lib/api';
+import T from '@/components/T';
+import { fetchSlides, fetchNews, fetchNotices, fetchEvents, fetchVideos, fetchStats, fetchLinks, fetchAlbums, fetchHeroIntro, fetchSiteTextSnippets, mediaUrl } from '@/lib/api';
 import { useLanguage } from '@/context/LanguageContext';
 import { preferLanguage } from '@/lib/i18n';
 
@@ -41,12 +41,64 @@ const ModernMinistryWebsite = () => {
   const [videoList, setVideoList] = useState([]);
   const [stats, setStats] = useState([]);
   const [quickLinks, setQuickLinks] = useState([]);
+  const [heroIntro, setHeroIntro] = useState(null);
+  const [textSnippets, setTextSnippets] = useState({});
 
+  const snippetText = (key, fallback = '') => {
+    const snippet = textSnippets[key];
+    if (!snippet) return fallback;
+    return preferLanguage(snippet.text, snippet.text_si, lang) || fallback;
+  };
+
+  const heroHeading = heroIntro ? preferLanguage(heroIntro.heading, heroIntro.heading_si, lang) : '';
+  const heroHighlight = heroIntro ? preferLanguage(heroIntro.highlight, heroIntro.highlight_si, lang) : '';
+  const heroDescription = heroIntro ? preferLanguage(heroIntro.description, heroIntro.description_si, lang) : '';
+  const heroPrimaryLabel = heroIntro ? preferLanguage(heroIntro.primary_label, heroIntro.primary_label_si, lang) : '';
+  const heroSecondaryLabel = heroIntro ? preferLanguage(heroIntro.secondary_label, heroIntro.secondary_label_si, lang) : '';
+  const heroPrimaryUrl = heroIntro?.primary_url || '#';
+  const heroSecondaryUrl = heroIntro?.secondary_url || '#';
+
+  const fallbackHeroHeading = snippetText('home_hero_heading', '');
+  const fallbackHeroHighlight = snippetText('home_hero_highlight', '');
+  const fallbackHeroDescription = snippetText('home_hero_description', '');
+  const fallbackPrimaryLabel = snippetText('home_hero_primary_label', '');
+  const fallbackSecondaryLabel = snippetText('home_hero_secondary_label', '');
+  const emptyHeroMessage = snippetText('home_hero_empty', 'Welcome section content will appear here once configured in the admin.');
+
+  const resolvedHeading = heroIntro ? (heroHeading || fallbackHeroHeading) : '';
+  const resolvedHighlight = heroIntro ? (heroHighlight || fallbackHeroHighlight) : '';
+  const resolvedDescription = heroIntro ? (heroDescription || fallbackHeroDescription) : '';
+  const resolvedPrimaryLabel = heroIntro ? (heroPrimaryLabel || fallbackPrimaryLabel) : '';
+  const resolvedSecondaryLabel = heroIntro ? (heroSecondaryLabel || fallbackSecondaryLabel) : '';
 
   useEffect(() => {
     const loadingTimer = setTimeout(() => {
       setIsLoading(false);
     }, 200);
+
+    (async () => {
+      try {
+        const data = await fetchHeroIntro();
+        const list = Array.isArray(data) ? data : (data?.results || []);
+        setHeroIntro(list.length ? list[0] : null);
+      } catch {
+        setHeroIntro(null);
+      }
+    })();
+
+    (async () => {
+      try {
+        const data = await fetchSiteTextSnippets();
+        const list = Array.isArray(data) ? data : (data?.results || []);
+        const map = {};
+        list.forEach((item) => {
+          map[item.key] = item;
+        });
+        setTextSnippets(map);
+      } catch {
+        setTextSnippets({});
+      }
+    })();
 
     // Try loading slides from the backend API (fallback to defaults on failure)
     (async () => {
@@ -60,8 +112,6 @@ const ModernMinistryWebsite = () => {
               image: mediaUrl(s.image),
               title: preferLanguage(s.title, s.title_si, lang),
               subtitle: preferLanguage(s.subtitle, s.subtitle_si, lang),
-              button_label: preferLanguage(s.button_label, s.button_label_si, lang),
-              button_url: s.button_url,
             }));
           setMainSlides(normalized);
           setCurrentSlide(0);
@@ -74,12 +124,31 @@ const ModernMinistryWebsite = () => {
       try {
         const data = await fetchNews();
         const list = Array.isArray(data) ? data : (data?.results || []);
-        const mapped = list.slice(0, 6).map((n, idx) => ({
-          title: preferLanguage(n.title, n.title_si, lang),
-          image: n.image ? mediaUrl(n.image) : `/images/newsItem${(idx % 6) + 1}.jpg`,
-          date: new Date(n.published_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-          time: new Date(n.published_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        }));
+        const mapped = list.slice(0, 6).map((n, idx) => {
+          const title = preferLanguage(n.title, n.title_si, lang);
+          const slug = n.slug || (n.id ? String(n.id) : '');
+          const publishedAt = n.published_at ? new Date(n.published_at) : null;
+          return {
+            id: n.id,
+            slug,
+            href: slug ? `/news/${slug}` : '#',
+            title,
+            image: n.image ? mediaUrl(n.image) : `/images/newsItem${(idx % 6) + 1}.jpg`,
+            date: publishedAt
+              ? publishedAt.toLocaleDateString('en-GB', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric',
+                })
+              : '',
+            time: publishedAt
+              ? publishedAt.toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              : '',
+          };
+        });
         setNewsItems(mapped);
       } catch {}
     })();
@@ -89,11 +158,16 @@ const ModernMinistryWebsite = () => {
       try {
         const data = await fetchNotices();
         const list = Array.isArray(data) ? data : (data?.results || []);
-        const mapped = list.slice(0, 8).map((n) => ({
-          title: preferLanguage(n.title, n.title_si, lang),
-          image: n.image ? mediaUrl(n.image) : '',
-          date: new Date(n.published_at).toDateString(),
-        }));
+        const mapped = list.slice(0, 8).map((n) => {
+          const published = n.published_at ? new Date(n.published_at) : null;
+          return {
+            id: n.id,
+            href: n.id ? `/notices/${n.id}` : n.url || '#',
+            title: preferLanguage(n.title, n.title_si, lang),
+            image: n.image ? mediaUrl(n.image) : '',
+            date: published ? published.toDateString() : '',
+          };
+        });
         setNotices(mapped);
       } catch {}
     })();
@@ -202,7 +276,7 @@ const ModernMinistryWebsite = () => {
       <HeroSlider mainSlides={mainSlides} currentSlide={currentSlide} setCurrentSlide={setCurrentSlide} />
       <MainNavigation />
       
-      <main className="container mx-auto px-6 py-16">
+      <main className="container mx-auto px-6 md:px-12 lg:px-24 py-16">
         {/* Welcome Section */}
         <section 
           id="welcome"
@@ -214,25 +288,45 @@ const ModernMinistryWebsite = () => {
           }`}
         >
           <div className="space-y-8">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight animate-slide-up">
-              <T>Welcome to</T>
-              <span className="block bg-gradient-to-r from-red-500 via-blue-500 to-yellow-400 bg-clip-text text-transparent animate-gradient-x mt-2">
-                <T>Piriven & Bhikkhu Education</T>
-              </span>
-            </h2>
-            <p className="text-gray-600 leading-relaxed text-lg animate-slide-up animation-delay-200">
-              <T>The Tripitaka literature states that the word Pirivena has been used since the time of the Buddha to refer to the monastery or hut where the monks lived. Pirivena is a traditional educational institution that has been operating in Sri Lanka for centuries, creating exemplary Bhikkhu leadership through disciplinary practices imposed by the Lord Buddha.</T>
-            </p>
-            <div className="flex space-x-6 animate-slide-up animation-delay-400">
-              <Link href="/full-explanation">
-                <button className="bg-black hover:bg-yellow-400 hover:text-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl hover:rotate-1 active:scale-95">
-                  <T>Read More</T>
-                </button>
-              </Link>
-              <button className="bg-orange-500 hover:bg-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl hover:-rotate-1 active:scale-95">
-                <T>IT Test</T>
-              </button>
-            </div>
+            {heroIntro ? (
+              <>
+                {(resolvedHeading || resolvedHighlight) ? (
+                  <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight animate-slide-up">
+                    {resolvedHeading ? <span className="block">{resolvedHeading}</span> : null}
+                    {resolvedHighlight ? (
+                      <span className="block bg-gradient-to-r from-red-500 via-blue-500 to-yellow-400 bg-clip-text text-transparent animate-gradient-x mt-2">
+                        {resolvedHighlight}
+                      </span>
+                    ) : null}
+                  </h2>
+                ) : null}
+                <p className="text-gray-600 leading-relaxed text-lg animate-slide-up animation-delay-200">
+                  {resolvedDescription || emptyHeroMessage}
+                </p>
+                {(resolvedPrimaryLabel || resolvedSecondaryLabel) ? (
+                  <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0 animate-slide-up animation-delay-400">
+                    {resolvedPrimaryLabel ? (
+                      <Link href={heroPrimaryUrl || '#'}>
+                        <button className="bg-black hover:bg-yellow-400 hover:text-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl hover:rotate-1 active:scale-95">
+                          {resolvedPrimaryLabel}
+                        </button>
+                      </Link>
+                    ) : null}
+                    {resolvedSecondaryLabel ? (
+                      <Link href={heroSecondaryUrl || '#'}>
+                        <button className="bg-orange-500 hover:bg-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl hover:-rotate-1 active:scale-95">
+                          {resolvedSecondaryLabel}
+                        </button>
+                      </Link>
+                    ) : null}
+                  </div>
+                ) : null}
+              </>
+            ) : (
+              <div className="bg-white border border-dashed border-gray-300 rounded-2xl p-8 shadow-sm animate-slide-up">
+                <p className="text-gray-500 text-lg">{emptyHeroMessage}</p>
+              </div>
+            )}
           </div>
           <div className="animate-slide-up animation-delay-600">
             <GallerySlider galleryImages={galleryImages} gallerySlide={gallerySlide} setGallerySlide={setGallerySlide} />
@@ -270,7 +364,7 @@ const ModernMinistryWebsite = () => {
           }`}
         >
           <div className="lg:col-span-2">
-            <h2 className="text-4xl font-bold text-gray-800 mb-12 animate-slide-up"><T>Latest News</T></h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-12 animate-slide-up">{snippetText('homepage_latest_news_title', 'Latest News')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
               {newsItems.slice(newsSlide * 3, (newsSlide * 3) + 3).map((news, index) => (
                 <div
@@ -304,22 +398,28 @@ const ModernMinistryWebsite = () => {
               </button>
             </div>
             <div className="text-center mt-8">
-              <button className="bg-black hover:bg-yellow-400 hover:text-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl active:scale-95">
-                <T>View All News</T>
-              </button>
+              <Link
+                href="/news"
+                className="inline-block bg-black hover:bg-yellow-400 hover:text-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl active:scale-95"
+              >
+                {snippetText('homepage_latest_news_cta', 'View All News')}
+              </Link>
             </div>
           </div>
           <div className="lg:col-span-1 animate-slide-up animation-delay-300">
-            <h2 className="text-4xl font-bold text-gray-800 mb-8"><T>Notices</T></h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-8">{snippetText('homepage_notices_title', 'Notices')}</h2>
             <div className="bg-white rounded-2xl p-6 shadow-lg h-96 overflow-y-auto hover:shadow-xl transition-shadow duration-300">
               <div className="space-y-6">
                 <NoticeCard items={notices} />
               </div>
             </div>
             <div className="text-center mt-6">
-              <button className="bg-black hover:bg-yellow-400 hover:text-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl active:scale-95">
-                <T>View All Notices</T>
-              </button>
+              <Link
+                href="/notices"
+                className="inline-block bg-black hover:bg-yellow-400 hover:text-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl active:scale-95"
+              >
+                {snippetText('homepage_notices_cta', 'View All Notices')}
+              </Link>
             </div>
           </div>
         </section>
@@ -356,7 +456,7 @@ const ModernMinistryWebsite = () => {
         >
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
             <div className="lg:col-span-2 animate-slide-up">
-              <h2 className="text-4xl font-bold text-gray-800 mb-8"><T>Calendar</T></h2>
+              <h2 className="text-4xl font-bold text-gray-800 mb-8">{snippetText('homepage_calendar_title', 'Calendar')}</h2>
               <div className="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-shadow duration-500">
                 <CalendarComponent />
               </div>
@@ -490,6 +590,20 @@ const ModernMinistryWebsite = () => {
 };
 
 export default ModernMinistryWebsite;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

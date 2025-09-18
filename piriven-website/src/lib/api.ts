@@ -1,4 +1,4 @@
-export const API_BASE =
+﻿export const API_BASE =
   (process.env.NEXT_PUBLIC_API || "http://127.0.0.1:8000/api").replace(/\/$/, "");
 
 export async function apiFetch(path: string, init?: RequestInit) {
@@ -66,8 +66,20 @@ export async function fetchNews(params?: string) {
   return apiFetch(`/news/${q}`);
 }
 
+export async function fetchNewsDetail(slug: string) {
+  if (!slug) throw new Error('Missing news slug');
+  return apiFetch(`/news/${slug}/`);
+}
+
 export async function fetchNotices() {
   return apiFetch("/notices/");
+}
+
+export async function fetchNotice(noticeId: string | number) {
+  if (noticeId === undefined || noticeId === null) {
+    throw new Error('Missing notice id');
+  }
+  return apiFetch(`/notices/${noticeId}/`);
 }
 
 export async function fetchEvents() {
@@ -100,6 +112,14 @@ export async function fetchContactInfo() {
   return apiFetch('/contact-info/');
 }
 
+export function fetchFooterAbout(params?: QueryParams) {
+  return getList('/footer-about/', params);
+}
+
+export function fetchFooterLinks(params?: QueryParams) {
+  return getList('/footer-links/', params);
+}
+
 export async function fetchPublications(params?: Record<string, string>) {
   const url = new URL(`${API_BASE}/publications/`);
   if (params) Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)));
@@ -126,5 +146,17 @@ export async function fetchAlbumBySlug(slug: string) {
 
 export function fetchAlbumImages(albumId: number, params?: QueryParams) {
   // direct images endpoint (useful if you disable nested images in AlbumSerializer or want pagination)
-  return getList("/gallery/", { album: albumId, page_size: 200, ...params });
+  return getList('/gallery/', { album: albumId, page_size: 200, ...params });
+}
+
+export async function fetchHeroIntro() {
+  return apiFetch('/hero-intro/');
+}
+
+export async function fetchAboutSections() {
+  return apiFetch('/about-sections/');
+}
+
+export async function fetchSiteTextSnippets() {
+  return apiFetch('/text-snippets/');
 }
