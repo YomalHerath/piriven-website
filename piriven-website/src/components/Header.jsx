@@ -1,17 +1,16 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import { Search, Menu, X } from 'lucide-react';
 import LanguageToggle from '@/components/LanguageToggle';
 import { useLanguage } from '@/context/LanguageContext';
-import { translateText } from '@/lib/i18n';
 
 export const Header = ({ mobileMenuOpen, setMobileMenuOpen }) => {
   const [searchFocused, setSearchFocused] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
   const { lang } = useLanguage();
-  const [searchPlaceholder, setSearchPlaceholder] = useState('Search...');
+  const searchPlaceholder = lang === 'si' ? 'සොයන්න...' : 'Search...';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,10 +19,6 @@ export const Header = ({ mobileMenuOpen, setMobileMenuOpen }) => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  useEffect(() => {
-    (async () => setSearchPlaceholder(await translateText('Search...', lang)))();
-  }, [lang]);
 
   return (
     <header
@@ -167,3 +162,6 @@ export const Header = ({ mobileMenuOpen, setMobileMenuOpen }) => {
     </header>
   );
 };
+
+
+

@@ -11,8 +11,10 @@ class TimeStamped(models.Model):
 
 class PublicationCategory(TimeStamped):
     name = models.CharField(max_length=200, unique=True)
+    name_si = models.CharField(max_length=200, blank=True)
     slug = models.SlugField(max_length=220, unique=True, blank=True)
     description = models.TextField(blank=True)
+    description_si = models.TextField(blank=True)
     position = models.PositiveIntegerField(default=0, help_text="Order categories by this field (ascending).")
 
     class Meta:
@@ -37,10 +39,14 @@ class PublicationEntry(TimeStamped):
         related_name="publications",
     )
     title = models.CharField(max_length=255)
+    title_si = models.CharField(max_length=255, blank=True)
     subtitle = models.CharField(max_length=255, blank=True)
+    subtitle_si = models.CharField(max_length=255, blank=True)
     authors = models.CharField(max_length=255, blank=True, help_text="Comma-separated author names")
+    authors_si = models.CharField(max_length=255, blank=True, help_text="Sinhala author names (optional)")
     year = models.PositiveIntegerField(null=True, blank=True)
     description = models.TextField(blank=True)
+    description_si = models.TextField(blank=True)
 
     cover = models.ImageField(upload_to="publication_covers/", blank=True, null=True)
     pdf_file = models.FileField(upload_to="publications/", blank=True, null=True, help_text="Optional PDF for the book")
@@ -76,6 +82,7 @@ class PublicationImage(TimeStamped):
     )
     image = models.ImageField(upload_to="publication_images/")
     caption = models.CharField(max_length=255, blank=True)
+    caption_si = models.CharField(max_length=255, blank=True)
 
     class Meta:
         ordering = ["created_at"]
@@ -84,3 +91,4 @@ class PublicationImage(TimeStamped):
 
     def __str__(self):
         return f"Image for {self.publication.title}"
+

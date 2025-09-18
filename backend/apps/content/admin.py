@@ -1,4 +1,4 @@
-from django.contrib import admin
+﻿from django.contrib import admin
 from django.utils.html import format_html
 from . import models
 
@@ -12,11 +12,12 @@ class NewsAdmin(admin.ModelAdmin):
 
     list_display = ("title", "published_at", "is_featured", "image_preview")
     list_filter = ("is_featured", "published_at")
-    search_fields = ("title", "excerpt")
+    search_fields = ("title", "title_si", "excerpt", "excerpt_si")
     prepopulated_fields = {"slug": ("title",)}
     readonly_fields = ("created_at", "updated_at")
     fieldsets = (
-        (None, {"fields": ("title", "slug", "excerpt", "content")}),
+        ("English", {"fields": ("title", "slug", "excerpt", "content")}),
+        ("Sinhala", {"fields": ("title_si", "excerpt_si", "content_si")}),
         ("Media", {"fields": ("image",)}),
         ("Publishing", {"fields": ("is_featured", "published_at", "created_at", "updated_at")}),
     )
@@ -26,18 +27,23 @@ class NewsAdmin(admin.ModelAdmin):
 class NoticeAdmin(admin.ModelAdmin):
     list_display = ("title", "published_at", "expires_at", "priority")
     list_filter = ("published_at", "expires_at")
-    search_fields = ("title", "content")
+    search_fields = ("title", "title_si", "content", "content_si")
+    fieldsets = (
+        ("English", {"fields": ("title", "content")}),
+        ("Sinhala", {"fields": ("title_si", "content_si")}),
+        ("Meta", {"fields": ("image", "published_at", "expires_at", "priority")}),
+    )
 
     def image_preview(self, obj):
-        from django.utils.html import format_html
         return format_html('<img src="{}" style="height:40px;border-radius:4px" />', obj.image.url) if obj.image else "-"
+
     image_preview.short_description = "Image"
 
 
 @admin.register(models.Publication)
 class PublicationAdmin(admin.ModelAdmin):
     def cover_preview(self, obj):
-        if getattr(obj, 'cover', None):
+        if getattr(obj, "cover", None):
             try:
                 return format_html('<img src="{}" style="height:40px;border-radius:4px;" />', obj.cover.url)
             except Exception:
@@ -46,11 +52,12 @@ class PublicationAdmin(admin.ModelAdmin):
 
     list_display = ("title", "category", "published_at", "is_active", "cover_preview")
     list_filter = ("category", "is_active", "published_at")
-    search_fields = ("title", "description")
+    search_fields = ("title", "title_si", "description", "description_si")
     autocomplete_fields = ("category",)
     readonly_fields = ("created_at", "updated_at")
     fieldsets = (
-        (None, {"fields": ("title", "description", "category")}),
+        ("English", {"fields": ("title", "description", "category")}),
+        ("Sinhala", {"fields": ("title_si", "description_si")}),
         ("File / Link", {"fields": ("file", "external_url")}),
         ("Cover", {"fields": ("cover",)}),
         ("Publishing", {"fields": ("is_active", "published_at", "created_at", "updated_at")}),
@@ -69,19 +76,20 @@ class VideoAdmin(admin.ModelAdmin):
 
     list_display = ("title", "published_at", "thumb")
     list_filter = ("published_at",)
-    search_fields = ("title", "description")
+    search_fields = ("title", "title_si", "description", "description_si")
     fieldsets = (
-        ("Basics", {"fields": ("title", "description")}),
-        ("Source (choose one)", {"fields": ("file", "url")}),   # ← updated
+        ("English", {"fields": ("title", "description")}),
+        ("Sinhala", {"fields": ("title_si", "description_si")}),
+        ("Source", {"fields": ("file", "url")}),
         ("Media", {"fields": ("thumbnail",)}),
         ("Publishing", {"fields": ("published_at",)}),
     )
 
 
-class GalleryImageInline(admin.TabularInline):  # or StackedInline if you prefer
+class GalleryImageInline(admin.TabularInline):
     model = models.GalleryImage
     extra = 3
-    fields = ("image", "caption", "position", "preview")
+    fields = ("image", "caption", "caption_si", "position", "preview")
     readonly_fields = ("preview",)
 
     def preview(self, obj):
@@ -95,12 +103,13 @@ class GalleryImageInline(admin.TabularInline):  # or StackedInline if you prefer
 class AlbumAdmin(admin.ModelAdmin):
     list_display = ("title", "is_active", "position", "published_at", "thumb")
     list_editable = ("is_active", "position")
-    search_fields = ("title", "description")
+    search_fields = ("title", "title_si", "description", "description_si")
     list_filter = ("is_active", "published_at")
     prepopulated_fields = {"slug": ("title",)}
     inlines = [GalleryImageInline]
     fieldsets = (
-        ("Basics", {"fields": ("title", "slug", "description")}),
+        ("English", {"fields": ("title", "slug", "description")}),
+        ("Sinhala", {"fields": ("title_si", "description_si")}),
         ("Cover", {"fields": ("cover",)}),
         ("Status", {"fields": ("is_active", "position", "published_at")}),
     )
@@ -118,25 +127,28 @@ class AlbumAdmin(admin.ModelAdmin):
 class EventAdmin(admin.ModelAdmin):
     list_display = ("title", "start_date", "end_date")
     list_filter = ("start_date", "end_date")
-    search_fields = ("title", "description")
+    search_fields = ("title", "title_si", "description", "description_si")
+    fields = ("title", "title_si", "description", "description_si", "start_date", "end_date")
 
 
 @admin.register(models.Stat)
 class StatAdmin(admin.ModelAdmin):
     list_display = ("label", "value")
-    search_fields = ("label",)
+    search_fields = ("label", "label_si", "value", "value_si")
+    fields = ("label", "label_si", "value", "value_si")
 
 
 @admin.register(models.ExternalLink)
 class ExternalLinkAdmin(admin.ModelAdmin):
     list_display = ("name", "url", "position")
     list_editable = ("position",)
-    search_fields = ("name",)
+    search_fields = ("name", "name_si")
+    fields = ("name", "name_si", "url", "position")
 
 
 class PublicationInline(admin.TabularInline):
     model = models.Publication
-    fields = ("title", "file", "external_url", "published_at", "is_active")
+    fields = ("title", "title_si", "file", "external_url", "published_at", "is_active")
     extra = 1
 
 
@@ -144,7 +156,8 @@ class PublicationInline(admin.TabularInline):
 class DownloadCategoryAdmin(admin.ModelAdmin):
     list_display = ("name", "position", "created_at")
     list_editable = ("position",)
-    search_fields = ("name", "description")
+    search_fields = ("name", "name_si", "description", "description_si")
+    fields = ("name", "name_si", "description", "description_si", "position")
     inlines = [PublicationInline]
 
 
@@ -157,12 +170,12 @@ class HeroSlideAdmin(admin.ModelAdmin):
 
     list_display = ("title", "position", "created_at", "image_preview")
     list_editable = ("position",)
-    search_fields = ("title", "subtitle")
+    search_fields = ("title", "title_si", "subtitle", "subtitle_si", "button_label", "button_label_si")
     readonly_fields = ("created_at", "updated_at")
     fieldsets = (
-        (None, {"fields": ("title", "subtitle")}),
+        ("English", {"fields": ("title", "subtitle", "button_label", "button_url")}),
+        ("Sinhala", {"fields": ("title_si", "subtitle_si", "button_label_si")}),
         ("Media", {"fields": ("image",)}),
-        ("Button", {"fields": ("button_label", "button_url")}),
         ("Ordering", {"fields": ("position",)}),
         ("Meta", {"fields": ("created_at", "updated_at")}),
     )
@@ -186,6 +199,18 @@ class ContactMessageAdmin(admin.ModelAdmin):
 class ContactInfoAdmin(admin.ModelAdmin):
     list_display = ("organization", "phone", "email", "created_at")
     readonly_fields = ("created_at", "updated_at")
+    fields = (
+        "organization",
+        "organization_si",
+        "phone",
+        "email",
+        "address",
+        "address_si",
+        "map_url",
+        "map_embed",
+        "created_at",
+        "updated_at",
+    )
 
     def has_add_permission(self, request):
         if models.ContactInfo.objects.exists():

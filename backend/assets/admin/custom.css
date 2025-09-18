@@ -1,0 +1,40 @@
+﻿.btn.btn-danger,
+.btn.btn-outline-danger:hover {
+  background-color: #c53030;
+  border-color: #c53030;
+  color: #fff;
+}
+
+.btn.btn-success {
+  background-color: #2f855a;
+  border-color: #2f855a;
+  color: #fff;
+}
+
+.btn.btn-warning {
+  background-color: #dd6b20;
+  border-color: #dd6b20;
+  color: #fff;
+}
+
+.btn.btn-info {
+  background-color: #3182ce;
+  border-color: #3182ce;
+  color: #fff;
+}
+
+.btn.btn-outline-secondary {
+  border-color: #4a5568;
+  color: #4a5568;
+}
+
+.btn.btn-outline-secondary:hover {
+  background-color: #4a5568;
+  border-color: #4a5568;
+  color: #fff;
+}
+
+.btn.btn-outline-danger {
+  border-color: #c53030;
+  color: #c53030;
+}

@@ -1,4 +1,4 @@
-import os
+﻿import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -163,6 +163,7 @@ JAZZMIN_SETTINGS = {
         "auth.User": "fas fa-user",
         "auth.Group": "fas fa-users",
     },
+    "custom_css": "admin/custom.css",
     "custom_links": {
         "content.News": [
             {
@@ -188,6 +189,11 @@ JAZZMIN_UI_TWEAKS = {
     "button_classes": {
         "primary": "btn btn-danger",
         "secondary": "btn btn-outline-secondary",
+        "success": "btn btn-success",
+        "warning": "btn btn-warning",
+        "info": "btn btn-info",
+        "danger": "btn btn-outline-danger",
     },
 }
+
 

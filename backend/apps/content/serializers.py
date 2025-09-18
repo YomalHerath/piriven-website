@@ -1,4 +1,4 @@
-from rest_framework import serializers
+﻿from rest_framework import serializers
 from . import models
 
 
@@ -27,8 +27,8 @@ class DownloadCategorySerializer(serializers.ModelSerializer):
         model = models.DownloadCategory
         fields = [
             "id",
-            "name",
-            "description",
+            "name", "name_si",
+            "description", "description_si",
             "position",
             "created_at",
             "updated_at",
@@ -53,7 +53,7 @@ class VideoSerializer(serializers.ModelSerializer):
 class GalleryImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.GalleryImage
-        fields = ["id", "image", "caption", "position", "created_at", "updated_at"]
+        fields = ["id", "image", "caption", "caption_si", "position", "created_at", "updated_at"]
 
 class AlbumSerializer(serializers.ModelSerializer):
     images = GalleryImageSerializer(many=True, read_only=True)
@@ -61,7 +61,7 @@ class AlbumSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Album
         fields = [
-            "id", "title", "slug", "description", "cover",
+            "id", "title", "title_si", "slug", "description", "description_si", "cover",
             "is_active", "position", "published_at",
             "images", "created_at", "updated_at",
         ]
@@ -107,3 +107,4 @@ class ContactInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ContactInfo
         fields = "__all__"
+

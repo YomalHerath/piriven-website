@@ -21,7 +21,7 @@ import { NewsletterSection } from './NewsLetter';
 import { Footer } from './Footer';
 import { fetchSlides, fetchNews, fetchNotices, fetchEvents, fetchVideos, fetchStats, fetchLinks, fetchAlbums, mediaUrl } from '@/lib/api';
 import { useLanguage } from '@/context/LanguageContext';
-import { translateText } from '@/lib/i18n';
+import { preferLanguage } from '@/lib/i18n';
 
 const ModernMinistryWebsite = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -54,24 +54,15 @@ const ModernMinistryWebsite = () => {
         const data = await fetchSlides();
         const list = Array.isArray(data) ? data : (data?.results || []);
         if (list.length) {
-          let normalized = list
+          const normalized = list
             .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
             .map((s) => ({
               image: mediaUrl(s.image),
-              title: s.title,
-              subtitle: s.subtitle,
-              button_label: s.button_label,
+              title: preferLanguage(s.title, s.title_si, lang),
+              subtitle: preferLanguage(s.subtitle, s.subtitle_si, lang),
+              button_label: preferLanguage(s.button_label, s.button_label_si, lang),
               button_url: s.button_url,
             }));
-          // Translate slide titles/subtitles/buttons
-          normalized = await Promise.all(
-            normalized.map(async (it) => ({
-              ...it,
-              title: await translateText(it.title, lang),
-              subtitle: await translateText(it.subtitle, lang),
-              button_label: await translateText(it.button_label || '', lang),
-            }))
-          );
           setMainSlides(normalized);
           setCurrentSlide(0);
         }
@@ -83,15 +74,12 @@ const ModernMinistryWebsite = () => {
       try {
         const data = await fetchNews();
         const list = Array.isArray(data) ? data : (data?.results || []);
-        const mappedRaw = list.slice(0, 6).map((n, idx) => ({
-          title: n.title,
+        const mapped = list.slice(0, 6).map((n, idx) => ({
+          title: preferLanguage(n.title, n.title_si, lang),
           image: n.image ? mediaUrl(n.image) : `/images/newsItem${(idx % 6) + 1}.jpg`,
           date: new Date(n.published_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
           time: new Date(n.published_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         }));
-        const mapped = await Promise.all(
-          mappedRaw.map(async (it) => ({ ...it, title: await translateText(it.title, lang) }))
-        );
         setNewsItems(mapped);
       } catch {}
     })();
@@ -101,14 +89,11 @@ const ModernMinistryWebsite = () => {
       try {
         const data = await fetchNotices();
         const list = Array.isArray(data) ? data : (data?.results || []);
-        const mappedRaw = list.slice(0, 8).map((n) => ({
-          title: n.title,
+        const mapped = list.slice(0, 8).map((n) => ({
+          title: preferLanguage(n.title, n.title_si, lang),
           image: n.image ? mediaUrl(n.image) : '',
           date: new Date(n.published_at).toDateString(),
         }));
-        const mapped = await Promise.all(
-          mappedRaw.map(async (it) => ({ ...it, title: await translateText(it.title, lang) }))
-        );
         setNotices(mapped);
       } catch {}
     })();
@@ -118,10 +103,12 @@ const ModernMinistryWebsite = () => {
       try {
         const data = await fetchVideos();
         const list = Array.isArray(data) ? data : (data?.results || []);
-        const translated = await Promise.all(
-          list.map(async (v) => ({ ...v, title: await translateText(v.title, lang) }))
-        );
-        setVideoList(translated);
+        const normalizedVideos = list.map((v) => ({
+          ...v,
+          title: preferLanguage(v.title, v.title_si, lang),
+          description: preferLanguage(v.description, v.description_si, lang),
+        }));
+        setVideoList(normalizedVideos);
       } catch {}
     })();
 
@@ -131,10 +118,12 @@ const ModernMinistryWebsite = () => {
         const data = await fetchStats();
         const list = Array.isArray(data) ? data : (data?.results || []);
         if (list.length) {
-          const translated = await Promise.all(
-            list.map(async (s) => ({ ...s, label: await translateText(s.label, lang) }))
-          );
-          setStats(translated.map((s, i) => ({ number: s.value, label: s.label, icon: [<BookOpen className="w-12 h-12" />, <Users className="w-12 h-12" />, <GraduationCap className="w-12 h-12" />, <Users className="w-12 h-12" />][i % 4] })));
+          const statsWithLabels = list.map((s, i) => ({
+            number: preferLanguage(s.value, s.value_si, lang) || s.value,
+            label: preferLanguage(s.label, s.label_si, lang),
+            icon: [<BookOpen className="w-12 h-12" />, <Users className="w-12 h-12" />, <GraduationCap className="w-12 h-12" />, <Users className="w-12 h-12" />][i % 4],
+          }));
+          setStats(statsWithLabels);
         }
       } catch {}
     })();
@@ -144,10 +133,11 @@ const ModernMinistryWebsite = () => {
       try {
         const data = await fetchLinks();
         const list = Array.isArray(data) ? data : (data?.results || []);
-        const translated = await Promise.all(
-          list.map(async (l) => ({ ...l, name: await translateText(l.name, lang) }))
-        );
-        setQuickLinks(translated);
+        const localizedLinks = list.map((l) => ({
+          ...l,
+          name: preferLanguage(l.name, l.name_si, lang),
+        }));
+        setQuickLinks(localizedLinks);
       } catch {}
     })();
 
@@ -375,7 +365,7 @@ const ModernMinistryWebsite = () => {
               <div className="space-y-6">
                 {quickLinks.map((link, index) => (
                   <div key={index} className="animate-slide-right" style={{ animationDelay: `${index * 150 + 600}ms`, animationFillMode: 'both' }}>
-                    <RightSideLink icon={<LinkIcon className="text-white w-6 h-6" />} text={link.name} url={link.url} />
+                    <RightSideLink icon={<LinkIcon className="text-white w-6 h-6" />} text={link.name} textSi={link.name_si} url={link.url} />
                   </div>
                 ))}
               </div>
@@ -500,4 +490,8 @@ const ModernMinistryWebsite = () => {
 };
 
 export default ModernMinistryWebsite;
+
+
+
+
 

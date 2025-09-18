@@ -1,13 +1,16 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import T from '@/components/T';
 import { fetchBooks, mediaUrl } from '@/lib/api';
+import { useLanguage } from '@/context/LanguageContext';
+import { preferLanguage } from '@/lib/i18n';
 
 export default function PublicationsSection() {
   const [items, setItems] = useState([]);
   const [err, setErr] = useState('');
   const [usedFallback, setUsedFallback] = useState(false);
+  const { lang } = useLanguage();
 
   useEffect(() => {
     (async () => {
@@ -64,7 +67,13 @@ export default function PublicationsSection() {
           const cover = mediaUrl(book?.cover);
           const href = book?.external_url || mediaUrl(book?.pdf_file) || '#';
           const isExternal = Boolean(book?.external_url);
-          const subtitle = [book?.subtitle, book?.authors, book?.year].filter(Boolean).join(' • ');
+          const localizedTitle = preferLanguage(book?.title, book?.title_si, lang) || book?.title || 'Publication';
+          const subtitleParts = [
+            preferLanguage(book?.subtitle, book?.subtitle_si, lang),
+            preferLanguage(book?.authors, book?.authors_si, lang),
+            book?.year,
+          ].filter(Boolean);
+          const subtitle = subtitleParts.join(' - ');
 
           return (
             <div key={book?.id} className="w-full">
@@ -78,7 +87,7 @@ export default function PublicationsSection() {
                   {cover ? (
                     <img
                       src={cover}
-                      alt={book?.title || 'Publication'}
+                      alt={localizedTitle}
                       loading="lazy"
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
@@ -93,7 +102,7 @@ export default function PublicationsSection() {
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 p-4 md:p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="space-y-1">
                       <h3 className="text-white text-base md:text-lg font-semibold leading-snug line-clamp-2 drop-shadow">
-                        {book?.title || <T>Untitled</T>}
+                        {localizedTitle || <T>Untitled</T>}
                       </h3>
                       {subtitle ? (
                         <p className="text-white/90 text-xs md:text-sm line-clamp-1">{subtitle}</p>
@@ -117,3 +126,5 @@ export default function PublicationsSection() {
 }
 
 export { PublicationsSection };
+
+

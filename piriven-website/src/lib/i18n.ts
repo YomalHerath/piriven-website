@@ -1,41 +1,49 @@
-export type Lang = 'en' | 'si';
+﻿export type Lang = 'en' | 'si';
 
-const cache: Record<string, string> = typeof window !== 'undefined'
-  ? JSON.parse(localStorage.getItem('translationCache') || '{}')
-  : {};
-
-function saveCache() {
-  try { localStorage.setItem('translationCache', JSON.stringify(cache)); } catch {}
+function normalize(value?: string | null): string {
+  return value && value.trim() ? value : '';
 }
 
-export function detectLang(text: string): Lang {
-  if (!text) return 'en';
-  const hasSinhala = /[\u0D80-\u0DFF]/.test(text);
-  return hasSinhala ? 'si' : 'en';
-}
-
-export async function translateText(text: string, target: Lang): Promise<string> {
-  if (!text) return '';
-  const key = `${target}|${text}`;
-  if (cache[key]) return cache[key];
-  const src = detectLang(text);
-  if (src === target) {
-    cache[key] = text; saveCache();
-    return text;
+export function preferLanguage(
+  english?: string | null,
+  sinhala?: string | null,
+  lang: Lang = 'en'
+): string {
+  const primary = lang === 'si' ? normalize(sinhala) : normalize(english);
+  if (primary) {
+    return primary;
   }
-  try {
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${target}&dt=t&q=${encodeURIComponent(text)}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    const translated = (data?.[0] || []).map((seg: any) => seg[0]).join('');
-    cache[key] = translated; saveCache();
-    return translated || text;
-  } catch {
-    return text;
-  }
+  const fallback = lang === 'si' ? normalize(english) : normalize(sinhala);
+  return fallback;
 }
 
-export async function translateArray(arr: string[], target: Lang): Promise<string[]> {
-  return Promise.all(arr.map((t) => translateText(t, target)));
+export function localizeField<T extends Record<string, unknown>>(
+  entry: T,
+  baseKey: string,
+  lang: Lang,
+): string {
+  const english = entry[baseKey];
+  const sinhala = entry[`${baseKey}_si`];
+  const englishText = typeof english === 'string' ? english : null;
+  const sinhalaText = typeof sinhala === 'string' ? sinhala : null;
+  return preferLanguage(englishText, sinhalaText, lang);
 }
 
+export function localizeOptional<T extends Record<string, unknown>>(
+  entry: T | null | undefined,
+  baseKey: string,
+  lang: Lang,
+): string {
+  if (!entry) return '';
+  return localizeField(entry, baseKey, lang);
+}
+
+export function hasSinhalaText(text?: string | null): boolean {
+  if (!text) return false;
+  return /[\u0D80-\u0DFF]/.test(text);
+}
+
+export function detectAvailableLang(entry: Record<string, unknown>, baseKey: string): Lang {
+  const sinhala = entry[`${baseKey}_si`];
+  return typeof sinhala === 'string' && sinhala.trim() ? 'si' : 'en';
+}

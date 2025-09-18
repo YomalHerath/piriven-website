@@ -1,16 +1,15 @@
-import React, { useState, useMemo, useEffect } from 'react';
+﻿import React, { useState, useMemo, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { fetchEvents } from '@/lib/api';
 import { useLanguage } from '@/context/LanguageContext';
-import { translateText } from '@/lib/i18n';
+import { preferLanguage } from '@/lib/i18n';
 
 dayjs.extend(isBetween);
 
 // Events fetched from backend; falls back to empty list
-const formatEvent = (e) => ({ date: e.start_date || e.date, title: e.title });
 
 export const CalendarComponent = () => {
   const [currentDate, setCurrentDate] = useState(dayjs());
@@ -22,9 +21,11 @@ export const CalendarComponent = () => {
       try {
         const data = await fetchEvents();
         const list = Array.isArray(data) ? data : (data?.results || []);
-        const mapped = list.map(formatEvent);
-        const translated = await Promise.all(mapped.map(async (e) => ({ ...e, title: await translateText(e.title, lang) })));
-        setEvents(translated);
+        const mapped = list.map((event) => ({
+          date: event.start_date || event.date,
+          title: preferLanguage(event.title, event.title_si, lang),
+        }));
+        setEvents(mapped);
       } catch (e) {
         setEvents([]);
       }
@@ -152,3 +153,4 @@ export const CalendarComponent = () => {
 };
 
 export default CalendarComponent;
+

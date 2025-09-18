@@ -1,23 +1,15 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { translateText } from '@/lib/i18n';
+import { preferLanguage } from '@/lib/i18n';
 
-export default function T({ text, as: As = 'span', className = '', children }) {
-  const content = text ?? (typeof children === 'string' ? children : '');
+export default function T({ text, textSi, as: As = 'span', className = '', children }) {
   const { lang } = useLanguage();
-  const [val, setVal] = React.useState(content);
-
-  React.useEffect(() => {
-    let alive = true;
-    (async () => {
-      const out = await translateText(content, lang);
-      if (alive) setVal(out);
-    })();
-    return () => { alive = false; };
-  }, [content, lang]);
-
-  return <As className={className}>{val}</As>;
+  const english = text ?? (typeof children === 'string' ? children : '');
+  const localized = preferLanguage(english, textSi, lang);
+  if (localized) {
+    return <As className={className}>{localized}</As>;
+  }
+  return <As className={className}>{children}</As>;
 }
-
