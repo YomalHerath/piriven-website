@@ -103,7 +103,7 @@ const ModernMinistryWebsite = () => {
         const list = Array.isArray(data) ? data : (data?.results || []);
         const mappedRaw = list.slice(0, 8).map((n) => ({
           title: n.title,
-          image: '',
+          image: n.image ? mediaUrl(n.image) : '',
           date: new Date(n.published_at).toDateString(),
         }));
         const mapped = await Promise.all(
@@ -500,3 +500,4 @@ const ModernMinistryWebsite = () => {
 };
 
 export default ModernMinistryWebsite;
+

@@ -17,13 +17,25 @@ export function mediaUrl(path?: string | null) {
   return path.startsWith("/media") ? `${base}${path}` : path;
 }
 
-function listify<T>(data: any): T[] {
-  if (Array.isArray(data)) return data;
-  if (data && Array.isArray(data.results)) return data.results;
+type QueryValue = string | number | boolean | null | undefined;
+type QueryParams = Record<string, QueryValue>;
+
+function listify<T>(data: unknown): T[] {
+  if (Array.isArray(data)) {
+    return data as T[];
+  }
+
+  if (data && typeof data === "object") {
+    const maybeResults = (data as { results?: unknown }).results;
+    if (Array.isArray(maybeResults)) {
+      return maybeResults as T[];
+    }
+  }
+
   return [];
 }
 
-async function getList<T = any>(path: string, params?: Record<string, any>) {
+async function getList<T = unknown>(path: string, params?: QueryParams) {
   const url = new URL(`${API_BASE}${path}`);
   if (params) for (const [k, v] of Object.entries(params)) {
     if (v !== undefined && v !== null) url.searchParams.set(k, String(v));
@@ -34,10 +46,10 @@ async function getList<T = any>(path: string, params?: Record<string, any>) {
   return listify<T>(json);
 }
 
-export function fetchBooks(params?: Record<string, any>) {
+export function fetchBooks(params?: QueryParams) {
   return getList("/books/", { page_size: 6, ...params });
 }
-export function fetchBookCategories(params?: Record<string, any>) {
+export function fetchBookCategories(params?: QueryParams) {
   return getList("/book-categories/", params);
 }
 
@@ -102,7 +114,7 @@ export async function fetchPublicationCategories() {
   return res.json();
 }
 
-export function fetchAlbums(params?: Record<string, any>) {
+export function fetchAlbums(params?: QueryParams) {
   // pulls albums with nested images when serializer includes them
   return getList("/albums/", { is_active: "true", ordering: "position", page_size: 50, ...params });
 }
@@ -112,7 +124,7 @@ export async function fetchAlbumBySlug(slug: string) {
   return Array.isArray(list) && list.length ? list[0] : null;
 }
 
-export function fetchAlbumImages(albumId: number, params?: Record<string, any>) {
+export function fetchAlbumImages(albumId: number, params?: QueryParams) {
   // direct images endpoint (useful if you disable nested images in AlbumSerializer or want pagination)
   return getList("/gallery/", { album: albumId, page_size: 200, ...params });
 }
