@@ -66,6 +66,10 @@ export async function fetchNews(params?: string) {
   return apiFetch(`/news/${q}`);
 }
 
+export async function fetchFeaturedNews() {
+  return apiFetch('/news/featured/');
+}
+
 export async function fetchNewsDetail(slug: string) {
   if (!slug) throw new Error('Missing news slug');
   return apiFetch(`/news/${slug}/`);

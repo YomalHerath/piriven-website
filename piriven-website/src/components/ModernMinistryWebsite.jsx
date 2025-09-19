@@ -19,7 +19,7 @@ import { VideosSection } from './Videos';
 import { NewsletterSection } from './NewsLetter';
 import { Footer } from './Footer';
 import T from '@/components/T';
-import { fetchSlides, fetchNews, fetchNotices, fetchVideos, fetchStats, fetchLinks, fetchAlbums, fetchHeroIntro, fetchSiteTextSnippets, mediaUrl } from '@/lib/api';
+import { fetchSlides, fetchNews, fetchFeaturedNews, fetchNotices, fetchVideos, fetchStats, fetchLinks, fetchAlbums, fetchHeroIntro, fetchSiteTextSnippets, mediaUrl } from '@/lib/api';
 import { useLanguage } from '@/context/LanguageContext';
 import { preferLanguage } from '@/lib/i18n';
 
@@ -211,7 +211,7 @@ const ModernMinistryWebsite = () => {
           fetchHeroIntro(),
           fetchSiteTextSnippets(),
           fetchSlides(),
-          fetchNews(),
+          fetchFeaturedNews(),
           fetchNotices(),
           fetchVideos(),
           fetchStats(),
