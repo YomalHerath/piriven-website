@@ -1,24 +1,35 @@
 ﻿"use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MainNavigation } from "@/components/MainNavigation";
 import { MobileMenu } from "@/components/MobileMenu";
 import { Download, FileText, Calendar, Users } from "lucide-react";
 import Link from "next/link";
+import dayjs from "dayjs";
 import { fetchDownloadCategories, mediaUrl } from "@/lib/api";
+import { useLanguage } from "@/context/LanguageContext";
+import { preferLanguage } from "@/lib/i18n";
 
 const DownloadsPage = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedDoc, setSelectedDoc] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [categories, setCategories] = useState([]);
   const [sectionsVisible, setSectionsVisible] = useState({});
+  const { lang } = useLanguage();
 
-  const documents = categories.map((c, idx) => ({
-    id: c.id ?? c.slug ?? `${c.name}-${idx}`,
-    name: c.name,
-  }));
+  const documents = useMemo(() => {
+    return categories.map((c) => ({
+      id: c.id ?? c.slug ?? c.name,
+      name: preferLanguage(c.name, c.name_si, lang) || c.name,
+    }));
+  }, [categories, lang]);
+
+  const selectedCategory = useMemo(() => {
+    if (!selectedCategoryId) return null;
+    return categories.find((c) => (c.id ?? c.slug) === selectedCategoryId) || null;
+  }, [categories, selectedCategoryId]);
 
   // 🆕 Add the useEffect hook for IntersectionObserver
   useEffect(() => {
@@ -28,7 +39,12 @@ const DownloadsPage = () => {
         const data = await fetchDownloadCategories();
         const list = Array.isArray(data) ? data : (data?.results || []);
         setCategories(list);
-        if (list.length) setSelectedDoc(list[0].name);
+        if (list.length) {
+          const firstId = list[0].id ?? list[0].slug ?? list[0].name;
+          setSelectedCategoryId(firstId);
+        } else {
+          setSelectedCategoryId(null);
+        }
       } catch (e) {
         // keep using fallback
         console.warn('Downloads API not available, using static samples.');
@@ -52,7 +68,7 @@ const DownloadsPage = () => {
     sections.forEach(section => observer.observe(section));
 
     return () => observer.disconnect();
-  }, [selectedDoc]); // Rerun effect when selectedDoc changes to animate new content
+  }, []);
 
   return (
     <div className="min-h-screen bg-white flex flex-col animate-fade-in">
@@ -83,15 +99,15 @@ const DownloadsPage = () => {
               {documents.map((doc, index) => (
                 <button
                   key={doc.id ?? doc.name ?? index}
-                  onClick={() => setSelectedDoc(doc.name)}
+                  onClick={() => setSelectedCategoryId(doc.id)}
                   className={`relative flex items-center justify-start w-full px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-300 transform ${
-                    selectedDoc === doc.name
+                    selectedCategoryId === doc.id
                       ? 'text-red-800 font-extrabold scale-105'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
                   <span className="flex-grow text-left">{doc.name}</span>
-                  {selectedDoc === doc.name && (
+                  {selectedCategoryId === doc.id && (
                     <span className="absolute bottom-0 left-0 h-0.5 bg-red-800 w-full animate-underline-grow"></span>
                   )}
                 </button>
@@ -112,11 +128,13 @@ const DownloadsPage = () => {
         >
           {/* Section Header */}
           <div className="text-center md:text-left mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4 animate-slide-up">{selectedDoc}</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4 animate-slide-up">
+              {selectedCategory ? (preferLanguage(selectedCategory.name, selectedCategory.name_si, lang) || selectedCategory.name) : <span>Documents</span>}
+            </h1>
             <div className="mt-6 flex flex-wrap items-center justify-center md:justify-start space-x-4 text-sm text-gray-500 animate-slide-up animation-delay-200">
               <div className="flex items-center">
                 <FileText className="w-4 h-4 mr-1 text-red-800" />
-                {(categories.find((c) => c.name === selectedDoc)?.publications?.length || 0)} Documents
+                {(selectedCategory?.publications?.length || 0)} Documents
               </div>
               <span>•</span>
               <div className="flex items-center">
@@ -127,9 +145,17 @@ const DownloadsPage = () => {
           </div>
 
           {/* Documents Grid */}
-          {(categories.find((c) => c.name === selectedDoc)?.publications?.length > 0) ? (
+          {(selectedCategory?.publications?.length || 0) > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {(categories.find((c) => c.name === selectedDoc)?.publications || []).map((pdf, index) => (
+              {(selectedCategory?.publications || []).map((pdf, index) => {
+                const publishedDate = pdf.published_at ? dayjs(pdf.published_at).format('MMMM YYYY') : '';
+                const department = preferLanguage(pdf.department, pdf.department_si, lang) || pdf.department || '';
+                const description = preferLanguage(pdf.description, pdf.description_si, lang) || pdf.description || '';
+                const title = preferLanguage(pdf.title, pdf.title_si, lang) || pdf.title || '';
+                const downloadHref = pdf.external_url || (pdf.file ? mediaUrl(pdf.file) : '');
+                const canDownload = Boolean(downloadHref);
+
+                return (
                 <div 
                   key={pdf.id ?? pdf.title ?? index} 
                   className="group bg-white rounded-lg shadow-lg hover:shadow-lg transition-all duration-500 hover:-translate-y-3 border border-gray-200 hover:border-gray-300 overflow-hidden animate-fade-in-up"
@@ -150,37 +176,45 @@ const DownloadsPage = () => {
 
                   <div className="p-6 space-y-4">
                     <h3 className="font-bold text-gray-800 leading-tight group-hover:text-red-800 transition-colors duration-300 text-lg">
-                      {pdf.title || pdf.name}
+                      {title}
                     </h3>
 
                     <div className="space-y-3">
                       <div className="flex items-center text-gray-600 text-sm">
                         <Calendar className="w-4 h-4 mr-2 text-red-800 flex-shrink-0" />
-                        <span>{pdf.date || ''}</span>
+                        <span>{publishedDate || <span className="text-gray-400">Not dated</span>}</span>
                       </div>
-                      <div className="flex items-center text-gray-600 text-sm">
-                        <Users className="w-4 h-4 mr-2 text-red-800 flex-shrink-0" />
-                        <span>{pdf.department || 'Downloads'}</span>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-xs font-semibold border border-gray-200">
-                          {pdf.classification || ''}
-                        </span>
-                      </div>
+                      {department ? (
+                        <div className="flex items-center text-gray-600 text-sm">
+                          <Users className="w-4 h-4 mr-2 text-red-800 flex-shrink-0" />
+                          <span>{department}</span>
+                        </div>
+                      ) : null}
+                      {description ? (
+                        <div className="flex flex-wrap gap-2">
+                          <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-xs font-semibold border border-gray-200">
+                            {description}
+                          </span>
+                        </div>
+                      ) : null}
                     </div>
 
                     <Link
-                      href={pdf.external_url || (pdf.file?.startsWith('/media') ? mediaUrl(pdf.file) : (pdf.url || '#'))}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center w-full bg-red-800 hover:bg-red-900 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group/btn mt-6"
+                      href={downloadHref || '#'}
+                      target={canDownload ? "_blank" : undefined}
+                      rel={canDownload ? "noopener noreferrer" : undefined}
+                      className={`flex items-center justify-center w-full font-bold py-3 px-4 rounded-xl transition-all duration-300 shadow-lg mt-6 ${
+                        canDownload
+                          ? 'bg-red-800 hover:bg-red-900 text-white hover:shadow-xl transform hover:-translate-y-1 group/btn'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
                     >
                       <Download className="w-5 h-5 mr-2 group-hover/btn:animate-bounce" />
                       Download PDF
                     </Link>
                   </div>
                 </div>
-              ))}
+              );})}
             </div>
           ) : (
             <div className="text-center py-20">

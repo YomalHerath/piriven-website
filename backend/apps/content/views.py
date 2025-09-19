@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from django.db import models as django_models
 
 from . import models, serializers
 from . import serializers as s
@@ -106,7 +107,12 @@ class NewsletterSubscriptionViewSet(mixins.CreateModelMixin,
 
 
 class DownloadCategoryViewSet(viewsets.ModelViewSet):
-    queryset = models.DownloadCategory.objects.all().order_by("position")
+    queryset = models.DownloadCategory.objects.all().order_by("position").prefetch_related(
+        django_models.Prefetch(
+            "publications",
+            queryset=models.Publication.objects.filter(is_active=True).order_by("-published_at", "-created_at")
+        )
+    )
     serializer_class = s.DownloadCategorySerializer
 
 

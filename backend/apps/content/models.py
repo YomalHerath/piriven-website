@@ -62,6 +62,8 @@ class Publication(TimeStamped):
     published_at = models.DateTimeField()
     is_active = models.BooleanField(default=True)
     cover = models.ImageField(upload_to="publication_covers", blank=True, null=True)
+    department = models.CharField(max_length=255, blank=True)
+    department_si = models.CharField(max_length=255, blank=True)
     # Category is added below via DownloadCategory foreign key once the model is declared
 
     class Meta:

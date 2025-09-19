@@ -52,16 +52,15 @@ class PublicationAdmin(admin.ModelAdmin):
                 return ""
         return ""
 
-    list_display = ("title", "category", "published_at", "is_active", "cover_preview")
+    list_display = ("title", "category", "published_at", "is_active")
     list_filter = ("category", "is_active", "published_at")
     search_fields = ("title", "title_si", "description", "description_si")
     autocomplete_fields = ("category",)
     readonly_fields = ("created_at", "updated_at")
     fieldsets = (
-        ("English", {"fields": ("title", "description", "category")}),
-        ("Sinhala", {"fields": ("title_si", "description_si")}),
-        ("File / Link", {"fields": ("file", "external_url")}),
-        ("Cover", {"fields": ("cover",)}),
+        ("English", {"fields": ("title", "description", "department", "category")}),
+        ("Sinhala", {"fields": ("title_si", "description_si", "department_si")}),
+        ("File", {"fields": ("file",)}),
         ("Publishing", {"fields": ("is_active", "published_at", "created_at", "updated_at")}),
     )
 
