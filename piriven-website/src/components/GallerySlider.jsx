@@ -1,11 +1,10 @@
 import React from 'react';
-
 import Link from 'next/link';
 import T from '@/components/T';
 
 export const GallerySlider = ({ galleryImages, gallerySlide, setGallerySlide }) => (
   <div className="space-y-6">
-    <div className="relative h-96 rounded-3xl overflow-hidden shadow-2xl group">
+    <div className="relative h-96 rounded-lg overflow-hidden shadow-2xl group">
       {galleryImages.map((image, index) => (
         <div
           key={index}
@@ -27,15 +26,15 @@ export const GallerySlider = ({ galleryImages, gallerySlide, setGallerySlide }) 
         <button
           key={index}
           onClick={() => setGallerySlide(index)}
-          className={`w-3 h-3 rounded-full transition-all duration-300 ${
-            index === gallerySlide ? 'bg-red-800 scale-125' : 'bg-gray-300 hover:bg-red-400'
+          className={`w-2 h-2 rounded-full transition-all duration-300 ${
+            index === gallerySlide ? 'bg-red-800 scale-125' : 'bg-gray-300 hover:bg-red-800'
           }`}
         />
       ))}
     </div>
     <div className="text-center">
       <Link href="/gallery">
-        <button className="bg-black hover:bg-yellow-400 hover:text-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl">
+        <button className="bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
           <T>View More Images</T>
         </button>
       </Link>

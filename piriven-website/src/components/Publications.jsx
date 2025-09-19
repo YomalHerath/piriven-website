@@ -7,7 +7,7 @@ import { fetchBooks, mediaUrl } from '@/lib/api';
 import { useLanguage } from '@/context/LanguageContext';
 import { preferLanguage } from '@/lib/i18n';
 
-export default function PublicationsSection() {
+export const PublicationsSection = () => {
   const [items, setItems] = useState([]);
   const [err, setErr] = useState('');
   const [usedFallback, setUsedFallback] = useState(false);
@@ -30,8 +30,8 @@ export default function PublicationsSection() {
 
   if (err) {
     return (
-      <section className="mt-0">
-        <h2 className="text-4xl font-bold text-gray-800 mb-2">
+      <section>
+        <h2 className="text-4xl font-light text-gray-800 mb-12 tracking-wide">
           <T>Latest Publications</T>
         </h2>
         <div className="text-red-600 text-sm">Error: {err}</div>
@@ -41,8 +41,8 @@ export default function PublicationsSection() {
 
   if (!items.length) {
     return (
-      <section className="mt-0">
-        <h2 className="text-4xl font-bold text-gray-800 mb-2">
+      <section>
+        <h2 className="text-4xl font-light text-gray-800 mb-12 tracking-wide">
           <T>Latest Publications</T>
         </h2>
         <p className="text-sm text-neutral-600"><T>No publications yet.</T></p>
@@ -51,9 +51,8 @@ export default function PublicationsSection() {
   }
 
   return (
-    // Remove big vertical margins so it doesn't drop lower
-    <section className="mt-0 mb-0">
-      <h2 className="text-4xl font-bold text-gray-800 mb-6">
+    <section>
+      <h2 className="text-4xl font-light text-gray-800 mb-12 tracking-wide">
         <T>Latest Publications</T>{' '}
         {usedFallback ? (
           <span className="align-middle text-sm font-normal text-neutral-500">
@@ -62,7 +61,6 @@ export default function PublicationsSection() {
         ) : null}
       </h2>
 
-      {/* Exact same layout: column on mobile, row on md+ */}
       <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6">
         {items.map((book) => {
           const cover = mediaUrl(book?.cover);
@@ -82,7 +80,7 @@ export default function PublicationsSection() {
                 href={href}
                 target={isExternal ? '_blank' : '_self'}
                 rel={isExternal ? 'noreferrer' : undefined}
-                className="group block w-full overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-neutral-800"
+                className="group block w-full overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <div className="relative w-full aspect-[3/4]">
                   {cover ? (
@@ -90,29 +88,27 @@ export default function PublicationsSection() {
                       src={cover}
                       alt={localizedTitle}
                       loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700"
                     />
                   ) : (
                     <div className="absolute inset-0 bg-neutral-200" />
                   )}
 
-                  {/* gradient overlay (hidden -> visible on hover) */}
                   <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-                  {/* Hover content: title, subtitle, CTA */}
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 p-4 md:p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="space-y-1">
-                      <h3 className="text-white text-base md:text-lg font-semibold leading-snug line-clamp-2 drop-shadow">
+                      <h3 className="text-white text-base md:text-lg font-light leading-snug line-clamp-2 drop-shadow">
                         {localizedTitle || <T>Untitled</T>}
                       </h3>
                       {subtitle ? (
-                        <p className="text-white/90 text-xs md:text-sm line-clamp-1">{subtitle}</p>
+                        <p className="text-white/90 text-xs md:text-sm font-light line-clamp-1">{subtitle}</p>
                       ) : null}
 
                       <div className="mt-2">
-                        <span className="inline-block rounded-xl bg-black/50 backdrop-blur-sm px-3 py-1 text-[11px] md:text-xs text-white">
+                        <button className="bg-transparent border-2 border-white hover:bg-white text-white hover:text-black px-4 py-2 rounded-lg font-light text-xs transition-colors duration-300">
                           <T>View publication</T>
-                        </span>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -123,21 +119,15 @@ export default function PublicationsSection() {
         })}
       </div>
 
-      <div className="mt-6 text-right">
-        <Link
-          href="/publications"
-          className="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800"
-        >
-          <T>Browse all publications</T>
+      <div className="mt-12 text-center">
+        <Link href="/publications">
+          <button className="inline-block bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
+            <T>Browse all publications</T>
+          </button>
         </Link>
       </div>
     </section>
   );
 }
 
-export { PublicationsSection };
-
-
-
-
-
+// export { PublicationsSection };

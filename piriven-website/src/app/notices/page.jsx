@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 
 import { Header } from '@/components/Header';
@@ -74,17 +74,17 @@ export default function NoticesPage() {
 
       <main className="container mx-auto px-6 py-16">
         <section className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
+          <h1 className="text-4xl md:text-5xl font-light text-gray-900">
             <T>All Notices</T>
           </h1>
-          {err ? <p className="mt-4 text-sm text-red-600">{err}</p> : null}
+          {err ? <p className="mt-4 text-sm text-red-800 font-light">{err}</p> : null}
           {!err && loading ? (
-            <p className="mt-4 text-sm text-neutral-600"><T>Loading notices…</T></p>
+            <p className="mt-4 text-sm text-neutral-600 font-light"><T>Loading notices…</T></p>
           ) : null}
         </section>
 
         {!loading && !notices.length ? (
-          <div className="text-center text-neutral-600">
+          <div className="text-center text-neutral-600 font-light">
             <T>No notices available yet.</T>
           </div>
         ) : null}
@@ -94,11 +94,11 @@ export default function NoticesPage() {
             <Link
               key={notice.id}
               href={notice.href}
-              className="group block bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden"
+              className="group block bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
             >
               <div className="md:flex">
                 {notice.image ? (
-                  <div className="md:w-1/3 h-48 md:h-auto bg-neutral-200 relative">
+                  <div className="md:w-1/3 aspect-video md:h-auto bg-neutral-200 relative">
                     <img
                       src={notice.image}
                       alt={notice.title}
@@ -108,7 +108,7 @@ export default function NoticesPage() {
                   </div>
                 ) : null}
                 <div className="flex-1 p-6 md:p-8">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                  <p className="text-xs font-light uppercase tracking-wide text-neutral-500">
                     {notice.date || <T>Undated</T>}
                     {notice.expires ? (
                       <span className="ml-3 text-neutral-400">
@@ -116,11 +116,11 @@ export default function NoticesPage() {
                       </span>
                     ) : null}
                   </p>
-                  <h2 className="mt-2 text-2xl font-semibold text-gray-900 leading-snug group-hover:text-red-800 transition-colors">
+                  <h2 className="mt-2 text-2xl font-light text-gray-900 leading-snug group-hover:text-red-800 transition-colors">
                     {notice.title}
                   </h2>
                   {notice.content ? (
-                    <p className="mt-4 text-sm text-neutral-600 whitespace-pre-line line-clamp-4">
+                    <p className="mt-4 text-sm font-light text-neutral-600 whitespace-pre-line line-clamp-4">
                       {notice.content}
                     </p>
                   ) : null}
@@ -132,7 +132,7 @@ export default function NoticesPage() {
 
         <div className="text-center pt-12">
           <Link href="/">
-            <button className="bg-black hover:bg-yellow-400 hover:text-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-300">
+            <button className="bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
               ← <T>Back to Home</T>
             </button>
           </Link>

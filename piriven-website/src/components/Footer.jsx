@@ -1,7 +1,7 @@
 ﻿'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-
+import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import T from '@/components/T';
 import { MapPin, Mail, Phone } from 'lucide-react';
 import { fetchFooterAbout, fetchFooterLinks, fetchContactInfo } from '@/lib/api';
@@ -109,28 +109,26 @@ export const Footer = () => {
   }, [contactDetails, lang]);
 
   return (
-    <footer className="relative bg-gray-900 text-gray-300">
-      <div className="absolute inset-0 bg-gradient-to-tr from-red-900/40 via-yellow-900/20 to-blue-900/30 pointer-events-none"></div>
-
+    <footer className="relative bg-black text-gray-300">
       <div className="relative container mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div>
-            <h4 className="font-bold text-xl mb-6 bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">
+            <h4 className="font-light text-xl mb-6 text-yellow-300">
               {aboutContent?.title || <T>About Us</T>}
             </h4>
             {aboutContent ? (
-              <p className="leading-relaxed text-gray-400 hover:text-gray-200 transition-colors duration-300 whitespace-pre-line">
+              <p className="font-light leading-relaxed text-gray-400 hover:text-gray-200 transition-colors duration-300 whitespace-pre-line">
                 {aboutContent.body}
               </p>
             ) : (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm font-light text-gray-500">
                 <T>Footer about content will appear here once added in the admin.</T>
               </p>
             )}
           </div>
 
           <div>
-            <h4 className="font-bold text-xl mb-6 bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">
+            <h4 className="font-light text-xl mb-6 text-yellow-300">
               <T>Quick Links</T>
             </h4>
             {localizedLinks.length ? (
@@ -143,46 +141,46 @@ export const Footer = () => {
                       target={link.url && link.url.startsWith('http') ? '_blank' : undefined}
                       rel={link.url && link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
                     >
-                      <span className="relative text-gray-400 group-hover:text-yellow-300 transition-colors duration-300">
+                      <span className="relative text-gray-400 font-light group-hover:text-yellow-300 transition-colors duration-300">
                         {link.name}
                       </span>
-                      <span className="block h-[2px] max-w-0 group-hover:max-w-full bg-yellow-400 transition-all duration-500"></span>
+                      <span className="block h-[2px] max-w-0 group-hover:max-w-full bg-yellow-300 transition-all duration-500"></span>
                     </a>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm font-light text-gray-500">
                 <T>No footer links yet.</T>
               </p>
             )}
           </div>
 
           <div>
-            <h4 className="font-bold text-xl mb-6 bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">
+            <h4 className="font-light text-xl mb-6 text-yellow-300">
               <T>Contact Us</T>
             </h4>
             {contactDetails ? (
               <div className="space-y-4">
                 {contactDetails.organization ? (
-                  <div className="text-sm text-gray-400 uppercase tracking-wide font-semibold">
+                  <div className="text-sm text-gray-400 uppercase tracking-wide font-light">
                     {contactDetails.organization}
                   </div>
                 ) : null}
                 {contactDetails.address ? (
                   <div className="flex items-start space-x-3 group">
-                    <MapPin className="w-5 h-5 mt-1 flex-shrink-0 text-yellow-400 group-hover:scale-110 transition-transform duration-300" />
-                    <span className="group-hover:text-white transition-colors duration-300">
+                    <MapPin className="w-5 h-5 mt-1 flex-shrink-0 text-yellow-300" />
+                    <span className="font-light group-hover:text-white transition-colors duration-300">
                       {contactDetails.address}
                     </span>
                   </div>
                 ) : null}
                 {contactDetails.email ? (
                   <div className="flex items-center space-x-3 group">
-                    <Mail className="w-5 h-5 text-yellow-400 group-hover:scale-110 transition-transform duration-300" />
+                    <Mail className="w-5 h-5 text-yellow-300" />
                     <a
                       href={`mailto:${contactDetails.email}`}
-                      className="group-hover:text-white transition-colors duration-300"
+                      className="font-light group-hover:text-white transition-colors duration-300"
                     >
                       {contactDetails.email}
                     </a>
@@ -190,10 +188,10 @@ export const Footer = () => {
                 ) : null}
                 {contactDetails.phone ? (
                   <div className="flex items-center space-x-3 group">
-                    <Phone className="w-5 h-5 text-yellow-400 group-hover:scale-110 transition-transform duration-300" />
+                    <Phone className="w-5 h-5 text-yellow-300" />
                     <a
                       href={`tel:${contactDetails.phone}`}
-                      className="group-hover:text-white transition-colors duration-300"
+                      className="font-light group-hover:text-white transition-colors duration-300"
                     >
                       {contactDetails.phone}
                     </a>
@@ -201,18 +199,18 @@ export const Footer = () => {
                 ) : null}
               </div>
             ) : (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm font-light text-gray-500">
                 <T>Contact information will appear here once added.</T>
               </p>
             )}
           </div>
 
           <div>
-            <h4 className="font-bold text-xl mb-6 bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">
+            <h4 className="font-light text-xl mb-6 text-yellow-300">
               <T>Location</T>
             </h4>
             {mapSrc ? (
-              <div className="w-full h-32 rounded-2xl overflow-hidden shadow-lg">
+              <div className="w-full h-32 rounded-lg overflow-hidden shadow-lg">
                 {mapSrc.startsWith('<') ? (
                   <div
                     className="w-full h-full"
@@ -232,7 +230,7 @@ export const Footer = () => {
                 )}
               </div>
             ) : (
-              <div className="w-full h-32 rounded-2xl overflow-hidden bg-gray-800 flex items-center justify-center text-sm text-gray-500">
+              <div className="w-full h-32 rounded-lg overflow-hidden bg-gray-800 flex items-center justify-center text-sm text-gray-500">
                 <T>Map will appear here once configured.</T>
               </div>
             )}
@@ -240,7 +238,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-gray-800 mt-12 pt-8 text-center">
-          <p className="text-gray-500 text-sm hover:text-gray-300 transition-colors duration-300">
+          <p className="text-gray-500 text-sm hover:text-gray-300 transition-colors duration-300 font-light">
             © {new Date().getFullYear()} State Ministry of Dhamma School, Piriven & Bhikku Education. <T>All Rights Reserved.</T>
           </p>
         </div>

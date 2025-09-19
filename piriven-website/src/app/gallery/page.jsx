@@ -81,12 +81,12 @@ export default function FullGallery() {
   }, [albums, selectedSlug]);
 
   return (
-    <div className="min-h-screen bg-gray-50 animate-fade-in">
+    <div className="min-h-screen bg-gray-50 animate-fade-in overflow-x-hidden">
       <Header mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       <MobileMenu mobileMenuOpen={mobileMenuOpen} />
       <MainNavigation />
 
-      <main className="container mx-auto px-6 py-16">
+      <main className="mx-auto px-6 md:px-10 py-18">
         {/* Header */}
         <section
           id="gallery-header"
@@ -95,10 +95,10 @@ export default function FullGallery() {
             sectionsVisible['gallery-header'] ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
           }`}
         >
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-light text-gray-900 leading-tight">
             <T>Our Photo Gallery</T>
           </h1>
-          {err ? <p className="mt-3 text-sm text-red-600">{err}</p> : null}
+          {err ? <p className="mt-3 text-sm text-red-600 font-light">{err}</p> : null}
         </section>
 
         {/* Album filter pills */}
@@ -113,10 +113,10 @@ export default function FullGallery() {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setSelectedSlug('all')}
-                className={`px-4 py-2 rounded-full text-sm border transition ${
+                className={`px-4 py-2 rounded-lg text-sm border transition ${
                   selectedSlug === 'all'
                     ? 'bg-black text-white border-black'
-                    : 'bg-white hover:bg-neutral-100 text-black border-neutral-300'
+                    : 'bg-white hover:bg-gray-100 text-black border-gray-300'
                 }`}
               >
                 <T>All</T>
@@ -125,10 +125,10 @@ export default function FullGallery() {
                 <button
                   key={a.id}
                   onClick={() => setSelectedSlug(a.slug)}
-                  className={`px-4 py-2 rounded-full text-sm border transition ${
+                  className={`px-4 py-2 rounded-lg text-sm border transition ${
                     selectedSlug === a.slug
                       ? 'bg-black text-white border-black'
-                      : 'bg-white hover:bg-neutral-100 text-black border-neutral-300'
+                      : 'bg-white hover:bg-gray-100 text-black border-gray-300'
                   }`}
                   title={a.description || a.title}
                 >
@@ -137,7 +137,7 @@ export default function FullGallery() {
               ))}
             </div>
           ) : (
-            <div className="text-sm text-neutral-600"><T>No albums yet.</T></div>
+            <div className="text-sm text-neutral-600 font-light"><T>No albums yet.</T></div>
           )}
         </section>
 
@@ -150,23 +150,30 @@ export default function FullGallery() {
           }`}
         >
           {!images.length ? (
-            <div className="text-sm text-neutral-600"><T>No photos to display.</T></div>
+            <div className="text-sm text-neutral-600 font-light"><T>No photos to display.</T></div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {images.map((img, index) => (
                 <div
                   key={img.id ?? index}
-                  className="relative overflow-hidden rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 animate-fade-in-up"
+                  className="relative overflow-hidden rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 animate-fade-in-up group transform hover:scale-105"
                   style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
-                  onClick={() => setFullScreenImage(img.url)}
                 >
                   <img
                     src={img.url}
                     alt={img.caption || 'Gallery image'}
                     className="w-full h-full object-cover cursor-pointer"
                   />
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <button 
+                        onClick={() => setFullScreenImage(img.url)}
+                        className="bg-transparent border-2 border-white hover:bg-transparent border-2 text-white hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300"
+                      >
+                        <T>View Image</T>
+                      </button>
+                  </div>
                   {img.caption ? (
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-2">
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-2 font-light">
                       {img.caption}
                     </div>
                   ) : null}
@@ -178,7 +185,7 @@ export default function FullGallery() {
 
         <div className="text-center pt-10 animate-fade-in-up animation-delay-600">
           <Link href="/">
-            <button className="bg-black hover:bg-yellow-400 hover:text-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl active:scale-95">
+            <button className="bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
               ← <T>Back to Home</T>
             </button>
           </Link>
@@ -193,7 +200,7 @@ export default function FullGallery() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md"
           onClick={() => setFullScreenImage(null)}
         >
-          <div className="relative max-w-7xl max-h-[90vh] overflow-hidden">
+          <div className="relative max-w-7xl max-h-[90vh] overflow-hidden rounded-lg">
             <img
               src={fullScreenImage}
               alt="Full screen view"
@@ -201,7 +208,7 @@ export default function FullGallery() {
               onClick={e => e.stopPropagation()}
             />
             <button
-              className="absolute top-4 right-4 text-white text-4xl font-light hover:text-red-500 transition-colors"
+              className="absolute top-4 right-4 text-white text-4xl font-light hover:text-red-800 transition-colors"
               onClick={() => setFullScreenImage(null)}
             >
               &times;

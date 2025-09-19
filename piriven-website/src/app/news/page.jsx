@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 
 import { Header } from '@/components/Header';
@@ -87,19 +87,19 @@ export default function NewsPage() {
       <MobileMenu mobileMenuOpen={mobileMenuOpen} />
       <MainNavigation />
 
-      <main className="container mx-auto px-6 py-16">
+      <main className="mx-auto px-6 md:px-10 py-18">
         <section className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
+          <h1 className="text-4xl md:text-5xl font-light text-gray-900">
             <T>All News</T>
           </h1>
-          {err ? <p className="mt-4 text-sm text-red-600">{err}</p> : null}
+          {err ? <p className="mt-4 text-sm text-red-600 font-light">{err}</p> : null}
           {!err && loading ? (
-            <p className="mt-4 text-sm text-neutral-600"><T>Loading news…</T></p>
+            <p className="mt-4 text-sm text-neutral-600 font-light"><T>Loading news…</T></p>
           ) : null}
         </section>
 
         {!loading && !news.length ? (
-          <div className="text-center text-neutral-600">
+          <div className="text-center text-neutral-600 font-light">
             <T>No news articles yet.</T>
           </div>
         ) : null}
@@ -109,7 +109,7 @@ export default function NewsPage() {
             <Link
               key={item.id}
               href={item.href}
-              className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
+              className="group bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
             >
               <div className="relative h-56 bg-neutral-200">
                 {item.image ? (
@@ -122,18 +122,18 @@ export default function NewsPage() {
                 ) : null}
               </div>
               <div className="p-6 flex flex-col flex-1">
-                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                <p className="text-xs font-light uppercase tracking-wide text-neutral-500">
                   {item.date}
                   {item.time ? <span className="ml-2 text-neutral-400">{item.time}</span> : null}
                 </p>
-                <h2 className="mt-3 text-xl font-semibold text-gray-900 leading-snug group-hover:text-blue-600 transition-colors">
+                <h2 className="mt-3 text-xl font-light text-gray-900 leading-snug group-hover:text-red-800 transition-colors">
                   {item.title}
                 </h2>
                 {item.excerpt ? (
-                  <p className="mt-3 text-sm text-neutral-600 line-clamp-3">{item.excerpt}</p>
+                  <p className="mt-3 text-sm text-neutral-600 font-light line-clamp-3">{item.excerpt}</p>
                 ) : null}
                 <div className="mt-auto pt-6">
-                  <span className="inline-flex items-center text-sm font-semibold text-blue-600">
+                  <span className="inline-flex items-center text-sm font-light text-red-800">
                     <T>Read full story</T>
                   </span>
                 </div>
@@ -144,14 +144,18 @@ export default function NewsPage() {
 
         <div className="text-center pt-12">
           <Link href="/">
-            <button className="bg-black hover:bg-yellow-400 hover:text-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-300">
+            <button className="bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
               ← <T>Back to Home</T>
             </button>
           </Link>
         </div>
+        
       </main>
 
       <Footer />
+
+      
     </div>
+    
   );
 }

@@ -57,7 +57,7 @@ const ContactPage = () => {
       />
       <MobileMenu mobileMenuOpen={mobileMenuOpen} />
       <MainNavigation />
-      <main className="container mx-auto px-6 py-16">
+      <main className="mx-auto px-6 md:px-10 py-18">
         <section
           id="contact-header"
           data-animate
@@ -67,8 +67,8 @@ const ContactPage = () => {
               : 'translate-y-10 opacity-0'
           }`}
         >
-          <h1 className="text-4xl font-bold text-gray-800 mb-8 animate-slide-up">Contact Us</h1>
-          <p className="text-lg text-gray-600 animate-slide-up animation-delay-200">
+          <h1 className="text-4xl font-light text-gray-800 mb-8 animate-slide-up">Contact Us</h1>
+          <p className="text-lg font-light text-gray-600 animate-slide-up animation-delay-200">
             This is the Contact Us page. Here you can find our contact details, location, and a contact form.
           </p>
         </section>
@@ -82,8 +82,8 @@ const ContactPage = () => {
           }`}
         >
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Send us a message</h2>
-            <p className="text-gray-600 mb-6">We’ll get back to you as soon as possible.</p>
+            <h2 className="text-2xl font-light text-gray-800 mb-4">Send us a message</h2>
+            <p className="font-light text-gray-600 mb-6">We’ll get back to you as soon as possible.</p>
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
@@ -102,32 +102,32 @@ const ContactPage = () => {
               className="space-y-4"
             >
               <div>
-                <label className="block text-sm font-medium text-gray-700">Name</label>
-                <input required value={form.name} onChange={(e)=>setForm({ ...form, name: e.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-red-700" />
+                <label className="block text-sm font-light text-gray-700">Name</label>
+                <input required value={form.name} onChange={(e)=>setForm({ ...form, name: e.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-red-800" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" required value={form.email} onChange={(e)=>setForm({ ...form, email: e.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 text-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-700" />
+                <label className="block text-sm font-light text-gray-700">Email</label>
+                <input type="email" required value={form.email} onChange={(e)=>setForm({ ...form, email: e.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 text-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-800" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Subject</label>
-                <input value={form.subject} onChange={(e)=>setForm({ ...form, subject: e.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 text-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-700" />
+                <label className="block text-sm font-light text-gray-700">Subject</label>
+                <input value={form.subject} onChange={(e)=>setForm({ ...form, subject: e.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 text-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-800" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Message</label>
-                <textarea required rows={6} value={form.message} onChange={(e)=>setForm({ ...form, message: e.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 text-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-700" />
+                <label className="block text-sm font-light text-gray-700">Message</label>
+                <textarea required rows={6} value={form.message} onChange={(e)=>setForm({ ...form, message: e.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 text-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-800" />
               </div>
-              {error && <p className="text-red-700 text-sm">{error}</p>}
-              {submitted && <p className="text-green-700 text-sm">Thanks! Your message has been sent.</p>}
-              <button disabled={submitting} className="bg-black disabled:opacity-60 hover:bg-yellow-400 hover:text-black text-white px-8 py-3 rounded-full font-semibold transition-all duration-300">
+              {error && <p className="text-red-700 text-sm font-light">{error}</p>}
+              {submitted && <p className="text-green-700 text-sm font-light">Thanks! Your message has been sent.</p>}
+              <button disabled={submitting} className="bg-red-800 disabled:opacity-60 hover:bg-black text-white px-8 py-3 rounded-lg font-light transition-colors duration-300">
                 {submitting ? 'Sending…' : 'Send Message'}
               </button>
             </form>
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Contact details</h3>
-            <div className="space-y-2 text-gray-700">
-              <p className="font-semibold">{info?.organization || 'Division of Piriven Education'}</p>
+            <h3 className="text-xl font-light text-gray-800 mb-4">Contact details</h3>
+            <div className="space-y-2 text-gray-700 font-light">
+              <p className="font-light">{info?.organization || 'Division of Piriven Education'}</p>
               <p>{info?.address || 'Isurupaya, Battaramulla, Sri Lanka'}</p>
               <p>
                 Phone: {info?.phone ? (<a className="text-red-800" href={`tel:${info.phone}`}>{info.phone}</a>) : (
@@ -140,7 +140,7 @@ const ContactPage = () => {
                 )}
               </p>
             </div>
-            <div className="mt-6 rounded-xl overflow-hidden shadow-lg border">
+            <div className="mt-6 rounded-lg overflow-hidden shadow-lg border">
               {info?.map_embed ? (
                 <div dangerouslySetInnerHTML={{ __html: info.map_embed }} />
               ) : (
