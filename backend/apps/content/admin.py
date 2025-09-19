@@ -1,7 +1,5 @@
 ﻿from django.contrib import admin
 from django.utils.html import format_html
-from django import forms
-from django.db import models as django_models
 from . import models
 
 
@@ -205,39 +203,6 @@ class ContactMessageAdmin(admin.ModelAdmin):
     search_fields = ("name", "email", "subject", "message")
     readonly_fields = ("created_at", "updated_at")
 
-
-@admin.register(models.ContactInfo)
-class ContactInfoAdmin(admin.ModelAdmin):
-    list_display = ("organization", "phone", "email", "created_at")
-    search_fields = ("organization", "organization_si", "address", "address_si")
-    readonly_fields = ("created_at", "updated_at")
-    formfield_overrides = {
-        django_models.DecimalField: {"widget": forms.NumberInput(attrs={"step": "0.000001"})},
-    }
-    fieldsets = (
-        (None, {"fields": ("organization", "organization_si")}),
-        ("Contact", {"fields": ("phone", "email", "address", "address_si")}),
-        (
-            "Map",
-            {
-                "fields": (
-                    "map_url",
-                    "map_embed",
-                    "latitude",
-                    "longitude",
-                    "map_zoom",
-                )
-            },
-        ),
-        ("System", {"fields": ("created_at", "updated_at")}),
-    )
-
-    def has_add_permission(self, request):
-        if models.ContactInfo.objects.exists():
-            return False
-        return super().has_add_permission(request)
-
-
 @admin.register(models.FooterAbout)
 class FooterAboutAdmin(admin.ModelAdmin):
     list_display = ("title", "is_active", "updated_at")
@@ -328,8 +293,6 @@ class SiteTextSnippetAdmin(admin.ModelAdmin):
         ("Sinhala", {"fields": ("text_si",)}),
         ("System", {"fields": ("created_at", "updated_at")}),
     )
-
-
 
 
 

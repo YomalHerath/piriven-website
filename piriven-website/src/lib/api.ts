@@ -160,3 +160,16 @@ export async function fetchAboutSections() {
 export async function fetchSiteTextSnippets() {
   return apiFetch('/text-snippets/');
 }
+
+export async function subscribeNewsletter(email: string) {
+  const res = await fetch(`${API_BASE}/newsletter/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  if (!res.ok) {
+    const message = await res.text();
+    throw new Error(message || 'Failed to subscribe');
+  }
+  return res.json();
+}

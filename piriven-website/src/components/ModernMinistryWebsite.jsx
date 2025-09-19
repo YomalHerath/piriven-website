@@ -1,9 +1,9 @@
 ﻿'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 
-import { ChevronLeft, ChevronRight, BookOpen, Users, GraduationCap, Search, Link as LinkIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BookOpen, Users, GraduationCap, Link as LinkIcon } from 'lucide-react';
 import { Header } from './Header';
 import { MobileMenu } from './MobileMenu';
 import { HeroSlider } from './HeroSlider';
@@ -19,7 +19,7 @@ import { VideosSection } from './Videos';
 import { NewsletterSection } from './NewsLetter';
 import { Footer } from './Footer';
 import T from '@/components/T';
-import { fetchSlides, fetchNews, fetchNotices, fetchEvents, fetchVideos, fetchStats, fetchLinks, fetchAlbums, fetchHeroIntro, fetchSiteTextSnippets, mediaUrl } from '@/lib/api';
+import { fetchSlides, fetchNews, fetchNotices, fetchVideos, fetchStats, fetchLinks, fetchAlbums, fetchHeroIntro, fetchSiteTextSnippets, mediaUrl } from '@/lib/api';
 import { useLanguage } from '@/context/LanguageContext';
 import { preferLanguage } from '@/lib/i18n';
 
@@ -37,20 +37,32 @@ const ModernMinistryWebsite = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [sectionsVisible, setSectionsVisible] = useState({});
   const { lang } = useLanguage();
-  
-  const [mainSlides, setMainSlides] = useState([]);
 
-  const [galleryImages, setGalleryImages] = useState([]);
-
-  const [newsItems, setNewsItems] = useState([]);
-  const [notices, setNotices] = useState([]);
-  const [videoList, setVideoList] = useState([]);
-  const [stats, setStats] = useState([]);
-  const [quickLinks, setQuickLinks] = useState([]);
-  const [heroIntro, setHeroIntro] = useState(null);
-  const [textSnippets, setTextSnippets] = useState({});
+  const [data, setData] = useState({
+    heroIntro: null,
+    textSnippets: {},
+    slides: [],
+    news: [],
+    notices: [],
+    videos: [],
+    stats: [],
+    links: [],
+    albums: [],
+  });
 
   const swiperRef = useRef(null);
+  const {
+    heroIntro,
+    textSnippets,
+    slides: rawSlides,
+    news: rawNews,
+    notices: rawNotices,
+    videos: rawVideos,
+    stats: rawStats,
+    links: rawLinks,
+    albums: rawAlbums,
+  } = data;
+
   const snippetText = (key, fallback = '') => {
     const snippet = textSnippets[key];
     if (!snippet) return fallback;
@@ -62,7 +74,7 @@ const ModernMinistryWebsite = () => {
   const heroDescription = heroIntro ? preferLanguage(heroIntro.description, heroIntro.description_si, lang) : '';
   const heroPrimaryLabel = heroIntro ? preferLanguage(heroIntro.primary_label, heroIntro.primary_label_si, lang) : '';
   const heroSecondaryLabel = heroIntro ? preferLanguage(heroIntro.secondary_label, heroIntro.secondary_label_si, lang) : '';
-  const heroPrimaryUrl = heroIntro?.primary_url || '#';
+  const heroPrimaryUrl = '/hero-intro';
   const heroSecondaryUrl = heroIntro?.secondary_url || '#';
 
   const fallbackHeroHeading = snippetText('home_hero_heading', '');
@@ -77,201 +89,267 @@ const ModernMinistryWebsite = () => {
   const resolvedDescription = heroIntro ? (heroDescription || fallbackHeroDescription) : '';
   const resolvedPrimaryLabel = heroIntro ? (heroPrimaryLabel || fallbackPrimaryLabel) : '';
   const resolvedSecondaryLabel = heroIntro ? (heroSecondaryLabel || fallbackSecondaryLabel) : '';
+  const heroDescriptionPreview = useMemo(() => {
+    if (!resolvedDescription) return '';
+    const cleaned = resolvedDescription.replace(/\s+/g, ' ').trim();
+    if (cleaned.length <= 200) return cleaned;
+    const snippet = cleaned.slice(0, 200).trim();
+    return snippet.replace(/[\s\p{P}]+$/u, '') + '…';
+  }, [resolvedDescription]);
+
+  const mainSlides = useMemo(() => {
+    if (!Array.isArray(rawSlides) || !rawSlides.length) return [];
+    return [...rawSlides]
+      .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+      .map((slide) => ({
+        image: mediaUrl(slide.image),
+        title: preferLanguage(slide.title, slide.title_si, lang),
+        subtitle: preferLanguage(slide.subtitle, slide.subtitle_si, lang),
+      }));
+  }, [rawSlides, lang]);
+
+  const newsItems = useMemo(() => {
+    if (!Array.isArray(rawNews) || !rawNews.length) return [];
+    return rawNews.slice(0, 6).map((n, index) => {
+      const title = preferLanguage(n.title, n.title_si, lang);
+      const slug = n.slug || (n.id ? String(n.id) : '');
+      const publishedAt = n.published_at ? new Date(n.published_at) : null;
+      return {
+        id: n.id ?? index,
+        slug,
+        href: slug ? `/news/${slug}` : '#',
+        title,
+        image: n.image ? mediaUrl(n.image) : `/images/newsItem${(index % 6) + 1}.jpg`,
+        date: publishedAt
+          ? publishedAt.toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+            })
+          : '',
+        time: publishedAt
+          ? publishedAt.toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })
+          : '',
+      };
+    });
+  }, [rawNews, lang]);
+
+  const notices = useMemo(() => {
+    if (!Array.isArray(rawNotices) || !rawNotices.length) return [];
+    return rawNotices.slice(0, 8).map((n, index) => {
+      const published = n.published_at ? new Date(n.published_at) : null;
+      return {
+        id: n.id ?? index,
+        href: n.id ? `/notices/${n.id}` : n.url || '#',
+        title: preferLanguage(n.title, n.title_si, lang),
+        image: n.image ? mediaUrl(n.image) : '',
+        date: published ? published.toDateString() : '',
+      };
+    });
+  }, [rawNotices, lang]);
+
+  const videoList = useMemo(() => {
+    if (!Array.isArray(rawVideos) || !rawVideos.length) return [];
+    return rawVideos.map((v, index) => ({
+      ...v,
+      id: v.id ?? index,
+      title: preferLanguage(v.title, v.title_si, lang),
+      description: preferLanguage(v.description, v.description_si, lang),
+    }));
+  }, [rawVideos, lang]);
+
+  const stats = useMemo(() => {
+    if (!Array.isArray(rawStats) || !rawStats.length) return [];
+    return rawStats.map((s, index) => ({
+      number: preferLanguage(s.value, s.value_si, lang) || s.value,
+      label: preferLanguage(s.label, s.label_si, lang),
+      icon: [
+        <BookOpen className="w-12 h-12" />,
+        <Users className="w-12 h-12" />,
+        <GraduationCap className="w-12 h-12" />,
+        <Users className="w-12 h-12" />,
+      ][index % 4],
+    }));
+  }, [rawStats, lang]);
+
+  const quickLinks = useMemo(() => {
+    if (!Array.isArray(rawLinks) || !rawLinks.length) return [];
+    return rawLinks.map((link, index) => ({
+      ...link,
+      id: link.id ?? index,
+      name: preferLanguage(link.name, link.name_si, lang),
+    }));
+  }, [rawLinks, lang]);
+
+  const galleryImages = useMemo(() => {
+    if (!Array.isArray(rawAlbums) || !rawAlbums.length) return [];
+    const albumWithImages = rawAlbums.find((album) => Array.isArray(album.images) && album.images.length);
+    if (!albumWithImages) return [];
+    return albumWithImages.images.map((img) => mediaUrl(img.image));
+  }, [rawAlbums]);
 
   useEffect(() => {
-    const loadingTimer = setTimeout(() => {
-      setIsLoading(false);
-    }, 200);
+    let cancelled = false;
 
-    (async () => {
+    const loadData = async () => {
+      setIsLoading(true);
       try {
-        const data = await fetchHeroIntro();
-        const list = Array.isArray(data) ? data : (data?.results || []);
-        setHeroIntro(list.length ? list[0] : null);
-      } catch {
-        setHeroIntro(null);
-      }
-    })();
+        const results = await Promise.allSettled([
+          fetchHeroIntro(),
+          fetchSiteTextSnippets(),
+          fetchSlides(),
+          fetchNews(),
+          fetchNotices(),
+          fetchVideos(),
+          fetchStats(),
+          fetchLinks(),
+          fetchAlbums(),
+        ]);
 
-    (async () => {
-      try {
-        const data = await fetchSiteTextSnippets();
-        const list = Array.isArray(data) ? data : (data?.results || []);
-        const map = {};
-        list.forEach((item) => {
-          map[item.key] = item;
+        if (cancelled) return;
+
+        const [
+          heroResult,
+          snippetResult,
+          slidesResult,
+          newsResult,
+          noticesResult,
+          videosResult,
+          statsResult,
+          linksResult,
+          albumsResult,
+        ] = results;
+
+        const heroList = heroResult.status === 'fulfilled'
+          ? (Array.isArray(heroResult.value)
+              ? heroResult.value
+              : (heroResult.value?.results ?? []))
+          : [];
+        const heroIntro = heroList.length ? heroList[0] : null;
+
+        const snippetsList = snippetResult.status === 'fulfilled'
+          ? (Array.isArray(snippetResult.value)
+              ? snippetResult.value
+              : (snippetResult.value?.results ?? []))
+          : [];
+        const snippetsMap = snippetsList.reduce((acc, item) => {
+          if (item?.key) acc[item.key] = item;
+          return acc;
+        }, {});
+
+        const slides = slidesResult.status === 'fulfilled'
+          ? (Array.isArray(slidesResult.value)
+              ? slidesResult.value
+              : (slidesResult.value?.results ?? []))
+          : [];
+
+        const news = newsResult.status === 'fulfilled'
+          ? (Array.isArray(newsResult.value)
+              ? newsResult.value
+              : (newsResult.value?.results ?? []))
+          : [];
+
+        const notices = noticesResult.status === 'fulfilled'
+          ? (Array.isArray(noticesResult.value)
+              ? noticesResult.value
+              : (noticesResult.value?.results ?? []))
+          : [];
+
+        const videos = videosResult.status === 'fulfilled'
+          ? (Array.isArray(videosResult.value)
+              ? videosResult.value
+              : (videosResult.value?.results ?? []))
+          : [];
+
+        const stats = statsResult.status === 'fulfilled'
+          ? (Array.isArray(statsResult.value)
+              ? statsResult.value
+              : (statsResult.value?.results ?? []))
+          : [];
+
+        const links = linksResult.status === 'fulfilled'
+          ? (Array.isArray(linksResult.value)
+              ? linksResult.value
+              : (linksResult.value?.results ?? []))
+          : [];
+
+        const albums = albumsResult.status === 'fulfilled'
+          ? (Array.isArray(albumsResult.value)
+              ? albumsResult.value
+              : (albumsResult.value?.results ?? []))
+          : [];
+
+        setData({
+          heroIntro,
+          textSnippets: snippetsMap,
+          slides,
+          news,
+          notices,
+          videos,
+          stats,
+          links,
+          albums,
         });
-        setTextSnippets(map);
-      } catch {
-        setTextSnippets({});
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
-    })();
+    };
 
-    // Try loading slides from the backend API (fallback to defaults on failure)
-    (async () => {
-      try {
-        const data = await fetchSlides();
-        const list = Array.isArray(data) ? data : (data?.results || []);
-        if (list.length) {
-          const normalized = list
-            .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
-            .map((s) => ({
-              image: mediaUrl(s.image),
-              title: preferLanguage(s.title, s.title_si, lang),
-              subtitle: preferLanguage(s.subtitle, s.subtitle_si, lang),
-            }));
-          setMainSlides(normalized);
-          setCurrentSlide(0);
-        }
-      } catch (e) {}
-    })();
+    loadData();
 
-    // Load news
-    (async () => {
-      try {
-        const data = await fetchNews();
-        const list = Array.isArray(data) ? data : (data?.results || []);
-        const mapped = list.slice(0, 6).map((n, idx) => {
-          const title = preferLanguage(n.title, n.title_si, lang);
-          const slug = n.slug || (n.id ? String(n.id) : '');
-          const publishedAt = n.published_at ? new Date(n.published_at) : null;
-          return {
-            id: n.id,
-            slug,
-            href: slug ? `/news/${slug}` : '#',
-            title,
-            image: n.image ? mediaUrl(n.image) : `/images/newsItem${(idx % 6) + 1}.jpg`,
-            date: publishedAt
-              ? publishedAt.toLocaleDateString('en-GB', {
-                  day: '2-digit',
-                  month: 'short',
-                  year: 'numeric',
-                })
-              : '',
-            time: publishedAt
-              ? publishedAt.toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })
-              : '',
-          };
-        });
-        setNewsItems(mapped);
-      } catch {}
-    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-    // Load notices
-    (async () => {
-      try {
-        const data = await fetchNotices();
-        const list = Array.isArray(data) ? data : (data?.results || []);
-        const mapped = list.slice(0, 8).map((n) => {
-          const published = n.published_at ? new Date(n.published_at) : null;
-          return {
-            id: n.id,
-            href: n.id ? `/notices/${n.id}` : n.url || '#',
-            title: preferLanguage(n.title, n.title_si, lang),
-            image: n.image ? mediaUrl(n.image) : '',
-            date: published ? published.toDateString() : '',
-          };
-        });
-        setNotices(mapped);
-      } catch {}
-    })();
-
-    // Load videos
-    (async () => {
-      try {
-        const data = await fetchVideos();
-        const list = Array.isArray(data) ? data : (data?.results || []);
-        const normalizedVideos = list.map((v) => ({
-          ...v,
-          title: preferLanguage(v.title, v.title_si, lang),
-          description: preferLanguage(v.description, v.description_si, lang),
-        }));
-        setVideoList(normalizedVideos);
-      } catch {}
-    })();
-
-    // Load stats
-    (async () => {
-      try {
-        const data = await fetchStats();
-        const list = Array.isArray(data) ? data : (data?.results || []);
-        if (list.length) {
-          const statsWithLabels = list.map((s, i) => ({
-            number: preferLanguage(s.value, s.value_si, lang) || s.value,
-            label: preferLanguage(s.label, s.label_si, lang),
-            icon: [<BookOpen className="w-12 h-12" />, <Users className="w-12 h-12" />, <GraduationCap className="w-12 h-12" />, <Users className="w-12 h-12" />][i % 4],
-          }));
-          setStats(statsWithLabels);
-        }
-      } catch {}
-    })();
-
-    // Load right side links
-    (async () => {
-      try {
-        const data = await fetchLinks();
-        const list = Array.isArray(data) ? data : (data?.results || []);
-        const localizedLinks = list.map((l) => ({
-          ...l,
-          name: preferLanguage(l.name, l.name_si, lang),
-        }));
-        setQuickLinks(localizedLinks);
-      } catch {}
-    })();
-
-    // Load gallery from first album
-    (async () => {
-      try {
-        const data = await fetchAlbums();
-        const list = Array.isArray(data) ? data : (data?.results || []);
-        if (list.length && Array.isArray(list[0].images)) {
-          const imgs = list[0].images.map((img) => mediaUrl(img.image));
-          if (imgs.length) setGalleryImages(imgs);
-        }
-      } catch {}
-    })();
-
-    const mainTimer = setInterval(() => {
-      if (mainSlides.length > 0) {
-        setCurrentSlide((prev) => (prev + 1) % mainSlides.length);
-      }
-    }, 5000);
-    
-    const galleryTimer = setInterval(() => {
-      if (galleryImages.length > 0) {
-        setGallerySlide((prev) => (prev + 1) % galleryImages.length);
-      }
-    }, 3000);
+  useEffect(() => {
+    if (isLoading) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setSectionsVisible(prev => ({
+            setSectionsVisible((prev) => ({
               ...prev,
-              [entry.target.id]: true
+              [entry.target.id]: true,
             }));
           }
         });
       },
-      { threshold: 0.1, rootMargin: '50px' }
+      { threshold: 0.1, rootMargin: '50px' },
     );
 
-    if (!isLoading) {
-      const sections = document.querySelectorAll('[data-animate]');
-      sections.forEach(section => observer.observe(section));
+    const sections = document.querySelectorAll('[data-animate]');
+    sections.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (!galleryImages.length) {
+      setGallerySlide(0);
+      return;
     }
 
-    return () => {
-      clearInterval(mainTimer);
-      clearInterval(galleryTimer);
-      clearTimeout(loadingTimer);
-      observer.disconnect();
-    };
-  }, [isLoading, mainSlides.length, lang]);
+    setGallerySlide((prev) => (prev >= galleryImages.length ? 0 : prev));
+  }, [galleryImages.length]);
+
+  useEffect(() => {
+    if (galleryImages.length < 2) return;
+
+    const timer = setInterval(() => {
+      setGallerySlide((prev) => (prev + 1) % galleryImages.length);
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [galleryImages.length]);
+
+  useEffect(() => {
+    setCurrentSlide((prev) => (mainSlides.length ? Math.min(prev, mainSlides.length - 1) : 0));
+  }, [mainSlides.length]);
 
   return (
     <div className="min-h-screen bg-gray-50 animate-fade-in">
@@ -310,7 +388,7 @@ const ModernMinistryWebsite = () => {
                   </h2>
                 ) : null}
                 <p className="text-gray-600 leading-relaxed text-lg animate-slide-up animation-delay-200 font-light">
-                  {resolvedDescription || emptyHeroMessage}
+                  {heroDescriptionPreview || emptyHeroMessage}
                 </p>
                 {(resolvedPrimaryLabel || resolvedSecondaryLabel) ? (
                   <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0 animate-slide-up animation-delay-400">

@@ -163,6 +163,7 @@ JAZZMIN_SETTINGS = {
         "auth.Group": "fas fa-users",
     },
     "custom_css": "admin/custom.css",
+    "custom_js": ["admin/custom.js"],
     "custom_links": {
         "content.News": [
             {
@@ -194,6 +195,5 @@ JAZZMIN_UI_TWEAKS = {
         "danger": "btn btn-outline-danger",
     },
 }
-
 
 
