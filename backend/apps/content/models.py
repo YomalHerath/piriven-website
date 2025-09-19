@@ -35,6 +35,22 @@ class News(TimeStamped):
         return self.title
 
 
+class NewsImage(TimeStamped):
+    news = models.ForeignKey(News, on_delete=models.CASCADE, related_name="gallery_images")
+    image = models.ImageField(upload_to="news/gallery")
+    caption = models.CharField(max_length=255, blank=True)
+    caption_si = models.CharField(max_length=255, blank=True)
+    position = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["position", "id"]
+        verbose_name = "News image"
+        verbose_name_plural = "News images"
+
+    def __str__(self):
+        return self.caption or f"Image for {self.news.title}"
+
+
 class Notice(TimeStamped):
     title = models.CharField(max_length=255)
     title_si = models.CharField(max_length=255, blank=True)
@@ -50,6 +66,22 @@ class Notice(TimeStamped):
 
     def __str__(self):
         return self.title
+
+
+class NoticeImage(TimeStamped):
+    notice = models.ForeignKey(Notice, on_delete=models.CASCADE, related_name="gallery_images")
+    image = models.ImageField(upload_to="notice/gallery")
+    caption = models.CharField(max_length=255, blank=True)
+    caption_si = models.CharField(max_length=255, blank=True)
+    position = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["position", "id"]
+        verbose_name = "Notice image"
+        verbose_name_plural = "Notice images"
+
+    def __str__(self):
+        return self.caption or f"Image for {self.notice.title}"
 
 
 class Publication(TimeStamped):
@@ -458,7 +490,6 @@ class FooterAbout(TimeStamped):
 
     def __str__(self):
         return self.title or "Footer about"
-
 
 
 

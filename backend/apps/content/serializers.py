@@ -2,16 +2,76 @@
 from . import models
 
 
+class NewsImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.NewsImage
+        fields = [
+            "id",
+            "image",
+            "caption",
+            "caption_si",
+            "position",
+            "created_at",
+            "updated_at",
+        ]
+
+
 class NewsSerializer(serializers.ModelSerializer):
+    gallery_images = NewsImageSerializer(many=True, read_only=True)
+
     class Meta:
         model = models.News
-        fields = "__all__"
+        fields = [
+            "id",
+            "title",
+            "title_si",
+            "slug",
+            "image",
+            "excerpt",
+            "excerpt_si",
+            "content",
+            "content_si",
+            "published_at",
+            "is_featured",
+            "created_at",
+            "updated_at",
+            "gallery_images",
+        ]
+
+
+class NoticeImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.NoticeImage
+        fields = [
+            "id",
+            "image",
+            "caption",
+            "caption_si",
+            "position",
+            "created_at",
+            "updated_at",
+        ]
 
 
 class NoticeSerializer(serializers.ModelSerializer):
+    gallery_images = NoticeImageSerializer(many=True, read_only=True)
+
     class Meta:
         model = models.Notice
-        fields = "__all__"
+        fields = [
+            "id",
+            "title",
+            "title_si",
+            "content",
+            "content_si",
+            "image",
+            "published_at",
+            "expires_at",
+            "priority",
+            "created_at",
+            "updated_at",
+            "gallery_images",
+        ]
 
 
 class PublicationSerializer(serializers.ModelSerializer):
@@ -197,5 +257,4 @@ class LibraryPublicationCategorySerializer(serializers.ModelSerializer):
             "updated_at",
             "publications_count",
         ]
-
 

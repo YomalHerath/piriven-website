@@ -3,6 +3,19 @@ from django.utils.html import format_html
 from . import models
 
 
+class NewsImageInline(admin.TabularInline):
+    model = models.NewsImage
+    extra = 1
+    fields = ("image", "caption", "caption_si", "position", "preview")
+    readonly_fields = ("preview",)
+
+    def preview(self, obj):
+        try:
+            return format_html('<img src="{}" style="height:60px;border-radius:4px;" />', obj.image.url)
+        except Exception:
+            return ""
+
+
 @admin.register(models.News)
 class NewsAdmin(admin.ModelAdmin):
     def image_preview(self, obj):
@@ -15,6 +28,7 @@ class NewsAdmin(admin.ModelAdmin):
     search_fields = ("title", "title_si", "excerpt", "excerpt_si")
     prepopulated_fields = {"slug": ("title",)}
     readonly_fields = ("created_at", "updated_at")
+    inlines = [NewsImageInline]
     fieldsets = (
         ("English", {"fields": ("title", "slug", "excerpt", "content")}),
         ("Sinhala", {"fields": ("title_si", "excerpt_si", "content_si")}),
@@ -23,11 +37,25 @@ class NewsAdmin(admin.ModelAdmin):
     )
 
 
+class NoticeImageInline(admin.TabularInline):
+    model = models.NoticeImage
+    extra = 1
+    fields = ("image", "caption", "caption_si", "position", "preview")
+    readonly_fields = ("preview",)
+
+    def preview(self, obj):
+        try:
+            return format_html('<img src="{}" style="height:60px;border-radius:4px;" />', obj.image.url)
+        except Exception:
+            return ""
+
+
 @admin.register(models.Notice)
 class NoticeAdmin(admin.ModelAdmin):
     list_display = ("title", "published_at", "expires_at", "priority")
     list_filter = ("published_at", "expires_at")
     search_fields = ("title", "title_si", "content", "content_si")
+    inlines = [NoticeImageInline]
     fieldsets = (
         ("English", {"fields": ("title", "content")}),
         ("Sinhala", {"fields": ("title_si", "content_si")}),
@@ -293,7 +321,6 @@ class SiteTextSnippetAdmin(admin.ModelAdmin):
         ("Sinhala", {"fields": ("text_si",)}),
         ("System", {"fields": ("created_at", "updated_at")}),
     )
-
 
 
 
