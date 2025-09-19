@@ -89,11 +89,13 @@ const ModernMinistryWebsite = () => {
   const resolvedDescription = heroIntro ? (heroDescription || fallbackHeroDescription) : '';
   const resolvedPrimaryLabel = heroIntro ? (heroPrimaryLabel || fallbackPrimaryLabel) : '';
   const resolvedSecondaryLabel = heroIntro ? (heroSecondaryLabel || fallbackSecondaryLabel) : '';
+  const HERO_DESCRIPTION_PREVIEW_LIMIT = 650;
+
   const heroDescriptionPreview = useMemo(() => {
     if (!resolvedDescription) return '';
     const cleaned = resolvedDescription.replace(/\s+/g, ' ').trim();
-    if (cleaned.length <= 200) return cleaned;
-    const snippet = cleaned.slice(0, 200).trim();
+    if (cleaned.length <= HERO_DESCRIPTION_PREVIEW_LIMIT) return cleaned;
+    const snippet = cleaned.slice(0, HERO_DESCRIPTION_PREVIEW_LIMIT).trim();
     return snippet.replace(/[\s\p{P}]+$/u, '') + '…';
   }, [resolvedDescription]);
 
