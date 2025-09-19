@@ -113,7 +113,7 @@ export default function FullGallery() {
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setSelectedSlug('all')}
-                className={`px-4 py-2 rounded-lg text-sm border transition ${
+                className={`cursor-pointer px-4 py-2 rounded-lg text-sm border transition ${
                   selectedSlug === 'all'
                     ? 'bg-black text-white border-black'
                     : 'bg-white hover:bg-gray-100 text-black border-gray-300'
@@ -125,7 +125,7 @@ export default function FullGallery() {
                 <button
                   key={a.id}
                   onClick={() => setSelectedSlug(a.slug)}
-                  className={`px-4 py-2 rounded-lg text-sm border transition ${
+                  className={`cursor-pointer px-4 py-2 rounded-lg text-sm border transition ${
                     selectedSlug === a.slug
                       ? 'bg-black text-white border-black'
                       : 'bg-white hover:bg-gray-100 text-black border-gray-300'
@@ -167,7 +167,7 @@ export default function FullGallery() {
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <button 
                         onClick={() => setFullScreenImage(img.url)}
-                        className="bg-transparent border-2 border-white hover:bg-transparent border-2 text-white hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300"
+                        className="cursor-pointer bg-transparent border-2 border-white hover:bg-transparent border-2 text-white hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300"
                       >
                         <T>View Image</T>
                       </button>
@@ -185,7 +185,7 @@ export default function FullGallery() {
 
         <div className="text-center pt-10 animate-fade-in-up animation-delay-600">
           <Link href="/">
-            <button className="bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
+            <button className="cursor-pointer bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
               ← <T>Back to Home</T>
             </button>
           </Link>
@@ -208,7 +208,7 @@ export default function FullGallery() {
               onClick={e => e.stopPropagation()}
             />
             <button
-              className="absolute top-4 right-4 text-white text-4xl font-light hover:text-red-800 transition-colors"
+              className="cursor-pointer absolute top-4 right-4 text-white text-4xl font-light hover:text-red-800 transition-colors"
               onClick={() => setFullScreenImage(null)}
             >
               &times;

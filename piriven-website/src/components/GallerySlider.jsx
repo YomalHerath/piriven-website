@@ -26,7 +26,7 @@ export const GallerySlider = ({ galleryImages, gallerySlide, setGallerySlide }) 
         <button
           key={index}
           onClick={() => setGallerySlide(index)}
-          className={`w-2 h-2 rounded-full transition-all duration-300 ${
+          className={`w-2 h-2 rounded-full transition-all cursor-pointer duration-300 ${
             index === gallerySlide ? 'bg-red-800 scale-125' : 'bg-gray-300 hover:bg-red-800'
           }`}
         />
@@ -34,7 +34,7 @@ export const GallerySlider = ({ galleryImages, gallerySlide, setGallerySlide }) 
     </div>
     <div className="text-center">
       <Link href="/gallery">
-        <button className="bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
+        <button className="cursor-pointer bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
           <T>View More Images</T>
         </button>
       </Link>

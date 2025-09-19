@@ -73,14 +73,14 @@ export const Header = ({ mobileMenuOpen, setMobileMenuOpen }) => {
               <Globe className="w-4 h-4 text-gray-500" />
               <button
                 onClick={() => handleLanguageChange('si')}
-                className={`text-sm hover:text-red-800 transition-colors duration-200 ${lang === 'si' ? 'text-red-800' : ''}`}
+                className={`text-sm cursor-pointer hover:text-red-800 transition-colors duration-200 ${lang === 'si' ? 'text-red-800' : ''}`}
               >
                 සිංහල
               </button>
               <span className="text-gray-400">|</span>
               <button
                 onClick={() => handleLanguageChange('en')}
-                className={`text-sm hover:text-red-800 transition-colors duration-200 ${lang === 'en' ? 'text-red-800' : ''}`}
+                className={`text-sm cursor-pointer hover:text-red-800 transition-colors duration-200 ${lang === 'en' ? 'text-red-800' : ''}`}
               >
                 English
               </button>
