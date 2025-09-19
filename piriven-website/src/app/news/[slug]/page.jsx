@@ -56,13 +56,31 @@ export default function NewsDetailPage() {
     }
 
     let ignore = false;
+
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = sessionStorage.getItem(`news-preview:${effectiveSlug}`);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          setData((prev) => prev ?? parsed);
+        }
+      } catch {}
+    }
+
     setLoading(true);
     setErr('');
 
     (async () => {
       try {
         const item = await fetchNewsDetail(effectiveSlug);
-        if (!ignore) setData(item);
+        if (!ignore) {
+          setData(item);
+          if (typeof window !== 'undefined') {
+            try {
+              sessionStorage.setItem(`news-preview:${effectiveSlug}`, JSON.stringify(item));
+            } catch {}
+          }
+        }
       } catch (error) {
         if (!ignore) setErr(error?.message || 'Failed to load news');
       } finally {

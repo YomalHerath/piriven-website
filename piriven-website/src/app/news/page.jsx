@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -39,6 +40,7 @@ function formatTime(value) {
 
 export default function NewsPage() {
   const { lang } = useLanguage();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -81,6 +83,15 @@ export default function NewsPage() {
     };
   }), [items, lang]);
 
+  useEffect(() => {
+    if (!news.length) return;
+    news.slice(0, 12).forEach((item) => {
+      if (item.href && item.href.startsWith('/news/') && router && typeof router.prefetch === 'function') {
+        try { router.prefetch(item.href); } catch {}
+      }
+    });
+  }, [news, router]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
@@ -109,6 +120,13 @@ export default function NewsPage() {
             <Link
               key={item.id}
               href={item.href}
+              prefetch
+              onClick={() => {
+                if (typeof window === 'undefined') return;
+                try {
+                  sessionStorage.setItem(`news-preview:${item.slug || item.id || item.href}`, JSON.stringify(item));
+                } catch {}
+              }}
               className="group bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
             >
               <div className="relative h-56 bg-neutral-200">

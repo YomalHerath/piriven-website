@@ -12,6 +12,15 @@ export const NewsCard = ({ news = {} }) => {
   const day = dateParts[0] || '';
   const rest = dateParts.length > 1 ? dateParts.slice(1).join(' ') : '';
 
+  const handleStorePreview = () => {
+    if (!isLinkable || !news) return;
+    if (typeof window === 'undefined') return;
+    try {
+      const key = `news-preview:${news.slug || news.id || href}`;
+      sessionStorage.setItem(key, JSON.stringify(news));
+    } catch {}
+  };
+
   const CardContent = () => (
     <>
       <div
@@ -56,7 +65,7 @@ export const NewsCard = ({ news = {} }) => {
   }
 
   return (
-    <Link href={href} className={`${baseClasses} block`}>
+    <Link href={href} prefetch onClick={handleStorePreview} className={`${baseClasses} block`}>
       <CardContent />
     </Link>
   );

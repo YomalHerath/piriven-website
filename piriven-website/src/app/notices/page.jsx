@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -27,6 +28,7 @@ function formatDate(value) {
 
 export default function NoticesPage() {
   const { lang } = useLanguage();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -66,6 +68,15 @@ export default function NoticesPage() {
     };
   }), [items, lang]);
 
+  useEffect(() => {
+    if (!notices.length) return;
+    notices.slice(0, 12).forEach((notice) => {
+      if (notice.href && notice.href.startsWith('/notices/') && router && typeof router.prefetch === 'function') {
+        try { router.prefetch(notice.href); } catch {}
+      }
+    });
+  }, [notices, router]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
@@ -94,6 +105,13 @@ export default function NoticesPage() {
             <Link
               key={notice.id}
               href={notice.href}
+              prefetch
+              onClick={() => {
+                if (typeof window === 'undefined') return;
+                try {
+                  sessionStorage.setItem(`notice-preview:${notice.id || notice.href}`, JSON.stringify(notice));
+                } catch {}
+              }}
               className="group block bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
             >
               <div className="md:flex">

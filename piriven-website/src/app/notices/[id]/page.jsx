@@ -50,13 +50,31 @@ export default function NoticeDetailPage() {
     }
 
     let ignore = false;
+
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = sessionStorage.getItem(`notice-preview:${noticeId}`);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          setData((prev) => prev ?? parsed);
+        }
+      } catch {}
+    }
+
     setLoading(true);
     setErr('');
 
     (async () => {
       try {
         const item = await fetchNotice(noticeId);
-        if (!ignore) setData(item);
+        if (!ignore) {
+          setData(item);
+          if (typeof window !== 'undefined') {
+            try {
+              sessionStorage.setItem(`notice-preview:${noticeId}`, JSON.stringify(item));
+            } catch {}
+          }
+        }
       } catch (error) {
         if (!ignore) setErr(error?.message || 'Failed to load notice');
       } finally {

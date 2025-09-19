@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { ChevronLeft, ChevronRight, BookOpen, Users, GraduationCap, Link as LinkIcon } from 'lucide-react';
 import { Header } from './Header';
@@ -33,6 +34,7 @@ const ModernMinistryWebsite = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [sectionsVisible, setSectionsVisible] = useState({});
   const { lang } = useLanguage();
+  const router = useRouter();
 
   const [data, setData] = useState({
     heroIntro: null,
@@ -160,6 +162,24 @@ const ModernMinistryWebsite = () => {
       };
     });
   }, [rawNotices, lang]);
+
+  useEffect(() => {
+    if (!newsItems.length) return;
+    newsItems.slice(0, 6).forEach((item) => {
+      if (item.href && item.href.startsWith('/news/') && router && typeof router.prefetch === 'function') {
+        try { router.prefetch(item.href); } catch {}
+      }
+    });
+  }, [newsItems, router]);
+
+  useEffect(() => {
+    if (!notices.length) return;
+    notices.slice(0, 6).forEach((item) => {
+      if (item.href && item.href.startsWith('/notices/') && router && typeof router.prefetch === 'function') {
+        try { router.prefetch(item.href); } catch {}
+      }
+    });
+  }, [notices, router]);
 
   const videoList = useMemo(() => {
     if (!Array.isArray(rawVideos) || !rawVideos.length) return [];

@@ -17,6 +17,15 @@ export const NoticeCard = ({ items }) => {
         const href = notice.href || notice.url || '#';
         const isExternal = Boolean(notice.url && !notice.href);
 
+        const handleStorePreview = () => {
+          if (isExternal) return;
+          if (typeof window === 'undefined') return;
+          try {
+            const key = `notice-preview:${notice.id || notice.slug || href}`;
+            sessionStorage.setItem(key, JSON.stringify(notice));
+          } catch {}
+        };
+
         return (
           <div
             key={notice.id || notice.slug || `${notice.title}-${notice.published_at}`}
@@ -36,6 +45,8 @@ export const NoticeCard = ({ items }) => {
               href={href}
               target={isExternal ? '_blank' : undefined}
               rel={isExternal ? 'noopener noreferrer' : undefined}
+              prefetch={!isExternal}
+              onClick={handleStorePreview}
               className="text-gray-700 hover:text-red-800 font-semibold line-clamp-2 transition-colors duration-300"
             >
               {notice.title}
