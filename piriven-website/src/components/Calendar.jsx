@@ -76,7 +76,7 @@ export const CalendarComponent = () => {
           >
             <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform duration-300" />
           </button>
-          <h3 className="font-bold text-xl text-gray-800 uppercase">
+          <h3 className="font-light text-xl text-gray-800 uppercase">
             {currentDate.format('MMMM YYYY')}
           </h3>
           {/* Next Month Button */}
@@ -87,7 +87,7 @@ export const CalendarComponent = () => {
             <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
           </button>
         </div>
-        <div className="grid grid-cols-7 text-center text-xs text-gray-500 font-semibold mb-4">
+        <div className="grid grid-cols-7 text-center text-xs text-gray-500 font-light mb-4">
           <span className="py-2">SU</span>
           <span className="py-2">MO</span>
           <span className="py-2">TU</span>
@@ -115,12 +115,12 @@ export const CalendarComponent = () => {
               >
                 {/* Event or Today marker */}
                 {isToday && (
-                  <span className="absolute w-10 h-10 rounded-full bg-red-700 opacity-80"></span>
+                  <span className="absolute w-10 h-10 rounded-full bg-red-800 opacity-80"></span>
                 )}
                 {!isToday && hasEvent && isCurrentMonth && (
-                  <span className="absolute w-10 h-10 rounded-full bg-yellow-500 opacity-80"></span>
+                  <span className="absolute w-10 h-10 rounded-full bg-yellow-300 opacity-80"></span>
                 )}
-                <span className={`relative z-10 font-medium ${isToday ? 'text-white' : ''}`}>
+                <span className={`relative z-10 font-light ${isToday ? 'text-white' : ''}`}>
                   {day.format('D')}
                 </span>
               </button>
@@ -129,7 +129,7 @@ export const CalendarComponent = () => {
         </div>
       </div>
       <div className="border-l border-gray-200 pl-8">
-        <h4 className="font-semibold text-gray-500 text-sm mb-6 uppercase tracking-wider">
+        <h4 className="font-light text-gray-500 text-sm mb-6 uppercase tracking-wider">
           EVENTS FOR {currentDate.format('MMMM').toUpperCase()}
         </h4>
         {currentMonthEvents.length > 0 ? (
@@ -137,20 +137,17 @@ export const CalendarComponent = () => {
             {currentMonthEvents.map((event, index) => (
               <li key={index} className="p-4 bg-gray-50 rounded-lg shadow-sm transition-shadow duration-300 hover:shadow-md">
                 <p className="text-xs text-gray-500 mb-1">{dayjs(event.date).format('MMMM D, YYYY')}</p>
-                <p className="font-semibold text-gray-800">{event.title}</p>
+                <p className="font-light text-gray-800">{event.title}</p>
               </li>
             ))}
           </ul>
         ) : (
           <div className="text-center text-gray-400 py-12">
             <Calendar className="w-16 h-16 mx-auto mb-4 opacity-50" />
-            <p className="text-lg">No Events</p>
+            <p className="text-lg font-light">No Events</p>
           </div>
         )}
       </div>
     </div>
   );
 };
-
-export default CalendarComponent;
-

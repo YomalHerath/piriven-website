@@ -17,8 +17,8 @@ export const MainNavigation = () => {
   ];
 
   return (
-    <nav className="bg-red-800 shadow-2xl relative z-20">
-      <div className="container mx-auto px-6">
+    <nav className="bg-red-800 shadow-md relative z-20">
+      <div className="container mx-auto px-4 md:px-8">
         <ul className="hidden md:flex justify-center space-x-12 text-white">
           {navItems.map(({ href, label, Icon }) => {
             const active = pathname === href;
@@ -27,16 +27,13 @@ export const MainNavigation = () => {
               <li key={href} className="relative group">
                 <Link
                   href={href}
-                  className={`flex items-center space-x-2 py-4 font-medium tracking-wider text-sm uppercase transition-colors duration-300 ${
+                  className={`flex items-center space-x-2 py-4 font-light tracking-widest text-sm uppercase transition-all duration-300 ${
                     active ? 'text-yellow-300' : 'text-white hover:text-yellow-300'
                   }`}
                 >
-                  {/* Icon hover tilt */}
                   <Icon
-                    className={`w-5 h-5 transition-transform duration-300 ${
-                      active
-                        ? 'text-yellow-300 rotate-0'
-                        : 'group-hover:-rotate-12 group-hover:scale-110'
+                    className={`w-5 h-5 transition-colors duration-300 ${
+                      active ? 'text-yellow-300' : 'text-white group-hover:text-yellow-300'
                     }`}
                   />
                   <T>{label}</T>
@@ -44,10 +41,10 @@ export const MainNavigation = () => {
 
                 {/* Underline */}
                 <span
-                  className={`absolute left-0 bottom-0 h-[3px] w-full transform origin-left transition-transform duration-500 ${
+                  className={`absolute left-0 bottom-0 h-0.5 transform origin-left transition-transform duration-300 ${
                     active
-                      ? 'scale-x-100 bg-yellow-400 animate-underline'
-                      : 'scale-x-0 bg-yellow-300 group-hover:scale-x-100'
+                      ? 'w-full bg-yellow-300 scale-x-100'
+                      : 'w-full bg-yellow-300 scale-x-0 group-hover:scale-x-100'
                   }`}
                 ></span>
               </li>
@@ -55,20 +52,6 @@ export const MainNavigation = () => {
           })}
         </ul>
       </div>
-
-      <style jsx>{`
-        @keyframes underline-grow {
-          from {
-            transform: scaleX(0);
-          }
-          to {
-            transform: scaleX(1);
-          }
-        }
-        .animate-underline {
-          animation: underline-grow 0.4s ease-out forwards;
-        }
-      `}</style>
     </nav>
   );
 };

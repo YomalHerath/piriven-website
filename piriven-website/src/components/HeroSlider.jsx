@@ -1,4 +1,7 @@
+'use client';
+
 import React, { useEffect, useState, useCallback } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const HeroSlider = ({ mainSlides, currentSlide, setCurrentSlide }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -26,20 +29,20 @@ export const HeroSlider = ({ mainSlides, currentSlide, setCurrentSlide }) => {
   };
 
   const prevSlide = () => {
-    setCurrentSlide(currentSlide === 0 ? mainSlides.length - 1 : currentSlide - 1);
+    setCurrentSlide(currentSlide === 0 ? mainSlides.length - 1 : currentSlide - 0);
   };
 
   if (!mainSlides || mainSlides.length === 0) {
     return (
-      <section className="relative h-[300px] overflow-hidden bg-gray-900 flex items-center justify-center">
-        <div className="text-white/70">No slides yet</div>
+      <section className="relative h-[600px] overflow-hidden bg-gray-900 flex items-center justify-center">
+        <div className="text-white/70 text-center font-light text-xl">No slides yet</div>
       </section>
     );
   }
 
   return (
     <section 
-      className="relative h-[600px] overflow-hidden bg-gray-900"
+      className="relative group h-[600px] overflow-hidden bg-gray-900"
       onMouseMove={handleMouseMove}
     >
       {/* Slide Content */}
@@ -91,7 +94,7 @@ export const HeroSlider = ({ mainSlides, currentSlide, setCurrentSlide }) => {
             
             {/* Professional Gradient Overlay */}
             <div className="absolute inset-0">
-              <div className={`absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent transition-opacity duration-1000 ${
+              <div className={`absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-black/30 transition-opacity duration-1000 ${
                 isActive ? 'opacity-100' : 'opacity-70'
               }`}></div>
             </div>
@@ -111,7 +114,7 @@ export const HeroSlider = ({ mainSlides, currentSlide, setCurrentSlide }) => {
                   
                   {/* Title with Stagger Animation */}
                   <div className="overflow-hidden mb-6">
-                    <h1 className="text-5xl md:text-7xl font-bold leading-tight">
+                    <h1 className="text-5xl md:text-7xl font-light leading-tight tracking-wide">
                       {slide.title.split(' ').map((word, wordIndex) => (
                         <span
                           key={wordIndex}
@@ -123,7 +126,7 @@ export const HeroSlider = ({ mainSlides, currentSlide, setCurrentSlide }) => {
                           style={{
                             transitionDelay: isActive ? `${300 + wordIndex * 100}ms` : '0ms',
                             transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
-                            textShadow: '0 2px 8px rgba(0,0,0,0.5)',
+                            textShadow: '0 1px 2px rgba(0,0,0,0.4)',
                           }}
                         >
                           {word}
@@ -135,7 +138,7 @@ export const HeroSlider = ({ mainSlides, currentSlide, setCurrentSlide }) => {
                   {/* Subtitle */}
                   <div className="overflow-hidden mb-8">
                     <p 
-                      className={`text-xl md:text-2xl text-gray-200 leading-relaxed transition-all duration-1000 ease-out ${
+                      className={`text-xl md:text-2xl text-gray-200 font-light leading-relaxed transition-all duration-1000 ease-out ${
                         isActive 
                           ? 'transform translate-y-0 opacity-100' 
                           : 'transform translate-y-12 opacity-0'
@@ -143,7 +146,7 @@ export const HeroSlider = ({ mainSlides, currentSlide, setCurrentSlide }) => {
                       style={{
                         transitionDelay: isActive ? '500ms' : '0ms',
                         transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
-                        textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+                        textShadow: '0 1px 2px rgba(0,0,0,0.4)',
                       }}
                     >
                       {slide.subtitle}
@@ -157,74 +160,58 @@ export const HeroSlider = ({ mainSlides, currentSlide, setCurrentSlide }) => {
         );
       })}
       
-      {/* Progress Bar */}
-      {mainSlides.length > 0 && (
-        <div className="absolute top-0 left-0 w-full h-1.5 bg-white/10 z-20">
-          <div 
-            className="h-full bg-yellow-500 transition-all duration-300 ease-out"
-            style={{ 
-              width: `${((currentSlide + 1) / mainSlides.length) * 100}%`,
-              boxShadow: '0 0 6px rgba(234, 179, 8, 0.4)'
-            }}
-          />
-        </div>
+      {/* Refined Navigation Arrows */}
+      {mainSlides.length > 1 && (
+        <>
+          <button
+            onClick={prevSlide}
+            className="absolute left-8 top-1/2 transform -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white p-3 rounded-full transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 z-30 opacity-0 group-hover:opacity-100"
+            style={{ transition: 'all 0.3s cubic-bezier(0.19, 1, 0.22, 1)' }}
+          >
+            <ChevronLeft className="w-6 h-6 transition-transform duration-300 group-hover:-translate-x-0.5" />
+          </button>
+                    <button
+            onClick={nextSlide}
+            className="absolute right-8 top-1/2 transform -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white p-3 rounded-full transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 z-30 opacity-0 group-hover:opacity-100"
+            style={{ transition: 'all 0.3s cubic-bezier(0.19, 1, 0.22, 1)' }}
+          >
+            <ChevronRight className="w-6 h-6 transition-transform duration-300 group-hover:translate-x-0.5" />
+          </button>
+        </>
       )}
-      
-      {/* Professional Dot Navigation */}
+
+      {/* Matching Dot Navigation */}
       <div 
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-3 "
-        style={{ zIndex: 20 }}
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-3 z-30 opacity-0 group-hover:opacity-100"
+        style={{ transition: 'all 0.3s cubic-bezier(0.19, 1, 0.22, 1)' }}
       >
         {mainSlides.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
-            className={`relative transition-all duration-400 ease-out transform focus:outline-none focus:ring-2 focus:ring-white/50 active:scale-90 ${
+            className={`relative w-2 h-2 transition-all duration-400 ease-out transform focus:outline-none focus:ring-2 focus:ring-white/50 active:scale-90 rounded-full ${
               index === currentSlide 
-                ? 'w-10 h-3 bg-yellow-500 rounded-full scale-100' 
-                : 'w-3 h-3 bg-white/40 hover:bg-white/70 rounded-full hover:scale-105'
+                ? 'bg-yellow-300 scale-100 w-6 h-2' 
+                : 'bg-white/40 hover:bg-white/70'
             }`}
-            style={{
-              transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
-            }}
           >
-            {/* Active indicator glow */}
+            {/* Subtle glow for the active dot */}
             {index === currentSlide && (
-              <span className="absolute inset-0 rounded-full bg-yellow-400 animate-pulse opacity-50 "></span>
+              <span className="absolute inset-0 rounded-full bg-yellow-300 animate-pulse opacity-50"></span>
             )}
           </button>
         ))}
       </div>
       
-      {/* Navigation Arrows */}
-      {mainSlides.length > 1 && (
-      <button
-        onClick={prevSlide}
-        className="absolute left-6 top-1/2 transform -translate-y-1/2 group bg-black/30 hover:bg-black/50 backdrop-blur-sm border border-white/10 text-white p-3 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/30"
-        style={{ zIndex: 20 }}
-      >
-        <svg className="w-6 h-6 group-hover:-translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-      )}
-      
-      {mainSlides.length > 1 && (
-      <button
-        onClick={nextSlide}
-        className="absolute right-6 top-1/2 transform -translate-y-1/2 group bg-black/30 hover:bg-black/50 backdrop-blur-sm border border-white/10 text-white p-3 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/30"
-        style={{ zIndex: 20 }}
-      >
-        <svg className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
-      )}
-
-      {/* Slide Counter */}
-      <div className="absolute top-8 right-8 text-white/80 font-mono text-sm backdrop-blur-sm bg-black/20 px-4 py-2 rounded-full border border-white/10" style={{ zIndex: 20 }}>
-        {String(currentSlide + 1).padStart(2, '0')} / {String(mainSlides.length).padStart(2, '0')}
-      </div>
+      {/* Progress Bar - Moved to bottom */}
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-black/10 z-20">
+          <div 
+            className="h-full bg-yellow-300 transition-all duration-300 ease-out"
+            style={{ 
+              width: `${((currentSlide + 1) / mainSlides.length) * 100}%`,
+            }}
+          />
+        </div>
     </section>
   );
 };

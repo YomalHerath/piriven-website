@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 
 import { Header } from '@/components/Header';
@@ -60,17 +60,17 @@ export default function VideosPage() {
 
       <main className="container mx-auto px-6 py-16">
         <section className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
+          <h1 className="text-4xl md:text-5xl font-light text-gray-900">
             <T>All Videos</T>
           </h1>
-          {err ? <p className="mt-4 text-sm text-red-600">{err}</p> : null}
+          {err ? <p className="mt-4 text-sm text-red-800 font-light">{err}</p> : null}
           {!err && loading ? (
-            <p className="mt-4 text-sm text-neutral-600"><T>Loading videos…</T></p>
+            <p className="mt-4 text-sm text-neutral-600 font-light"><T>Loading videos…</T></p>
           ) : null}
         </section>
 
         {!loading && !videos.length ? (
-          <div className="text-center text-neutral-600">
+          <div className="text-center text-neutral-600 font-light">
             <T>No videos published yet.</T>
           </div>
         ) : null}
@@ -79,7 +79,7 @@ export default function VideosPage() {
           {videos.map((video) => (
             <article
               key={video.id}
-              className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
+              className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
             >
               <div className="relative h-56 bg-neutral-200">
                 {video.thumbnail ? (
@@ -96,11 +96,11 @@ export default function VideosPage() {
                 )}
               </div>
               <div className="p-6 flex flex-col flex-1">
-                <h2 className="text-xl font-semibold text-gray-900 leading-snug">
+                <h2 className="text-xl font-light text-gray-900 leading-snug">
                   {video.title}
                 </h2>
                 {video.description ? (
-                  <p className="mt-3 text-sm text-neutral-600 line-clamp-4">{video.description}</p>
+                  <p className="mt-3 text-sm text-neutral-600 font-light line-clamp-4">{video.description}</p>
                 ) : null}
                 <div className="mt-auto pt-6">
                   {video.playback ? (
@@ -108,12 +108,12 @@ export default function VideosPage() {
                       href={video.playback}
                       target={video.hasExternal ? '_blank' : '_self'}
                       rel={video.hasExternal ? 'noreferrer' : undefined}
-                      className="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800"
+                      className="inline-flex items-center text-sm font-light text-red-800"
                     >
                       <T>Play video</T>
                     </a>
                   ) : (
-                    <span className="inline-flex items-center text-sm font-semibold text-neutral-400">
+                    <span className="inline-flex items-center text-sm font-light text-neutral-400">
                       <T>Video unavailable</T>
                     </span>
                   )}
@@ -125,7 +125,7 @@ export default function VideosPage() {
 
         <div className="text-center pt-12">
           <Link href="/">
-            <button className="bg-black hover:bg-yellow-400 hover:text-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-300">
+            <button className="bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
               ← <T>Back to Home</T>
             </button>
           </Link>

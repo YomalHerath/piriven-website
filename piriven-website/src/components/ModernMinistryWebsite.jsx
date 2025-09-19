@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 import { ChevronLeft, ChevronRight, BookOpen, Users, GraduationCap, Search, Link as LinkIcon } from 'lucide-react';
@@ -23,10 +23,16 @@ import { fetchSlides, fetchNews, fetchNotices, fetchEvents, fetchVideos, fetchSt
 import { useLanguage } from '@/context/LanguageContext';
 import { preferLanguage } from '@/lib/i18n';
 
+// Import Swiper React components and styles
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/autoplay';
+import 'swiper/css/navigation';
+
 const ModernMinistryWebsite = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [gallerySlide, setGallerySlide] = useState(0);
-  const [newsSlide, setNewsSlide] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [sectionsVisible, setSectionsVisible] = useState({});
@@ -44,6 +50,7 @@ const ModernMinistryWebsite = () => {
   const [heroIntro, setHeroIntro] = useState(null);
   const [textSnippets, setTextSnippets] = useState({});
 
+  const swiperRef = useRef(null);
   const snippetText = (key, fallback = '') => {
     const snippet = textSnippets[key];
     if (!snippet) return fallback;
@@ -273,15 +280,17 @@ const ModernMinistryWebsite = () => {
         setMobileMenuOpen={setMobileMenuOpen} 
       />
       <MobileMenu mobileMenuOpen={mobileMenuOpen} />
-      <HeroSlider mainSlides={mainSlides} currentSlide={currentSlide} setCurrentSlide={setCurrentSlide} />
       <MainNavigation />
+      <HeroSlider mainSlides={mainSlides} currentSlide={currentSlide} setCurrentSlide={setCurrentSlide} />
       
-      <main className="container mx-auto px-6 md:px-12 lg:px-24 py-16">
+      
+      <main className="mx-auto px-6 md:px-10 py-18">
+        
         {/* Welcome Section */}
         <section 
           id="welcome"
           data-animate
-          className={`grid grid-cols-1 lg:grid-cols-2 gap-16 mb-20 transition-all duration-1000 transform ${
+          className={`grid grid-cols-1 lg:grid-cols-2 gap-16 mb-16 transition-all duration-1000 transform ${
             sectionsVisible.welcome 
               ? 'translate-y-0 opacity-100' 
               : 'translate-y-10 opacity-0'
@@ -291,30 +300,30 @@ const ModernMinistryWebsite = () => {
             {heroIntro ? (
               <>
                 {(resolvedHeading || resolvedHighlight) ? (
-                  <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight animate-slide-up">
+                  <h2 className="text-4xl md:text-5xl font-light text-gray-900 leading-tight animate-slide-up tracking-wide">
                     {resolvedHeading ? <span className="block">{resolvedHeading}</span> : null}
                     {resolvedHighlight ? (
-                      <span className="block bg-gradient-to-r from-red-500 via-blue-500 to-yellow-400 bg-clip-text text-transparent animate-gradient-x mt-2">
+                      <span className="block bg-gradient-to-r from-red-500 via-blue-500 to-yellow-400 bg-clip-text text-transparent mt-2">
                         {resolvedHighlight}
                       </span>
                     ) : null}
                   </h2>
                 ) : null}
-                <p className="text-gray-600 leading-relaxed text-lg animate-slide-up animation-delay-200">
+                <p className="text-gray-600 leading-relaxed text-lg animate-slide-up animation-delay-200 font-light">
                   {resolvedDescription || emptyHeroMessage}
                 </p>
                 {(resolvedPrimaryLabel || resolvedSecondaryLabel) ? (
                   <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0 animate-slide-up animation-delay-400">
                     {resolvedPrimaryLabel ? (
                       <Link href={heroPrimaryUrl || '#'}>
-                        <button className="bg-black hover:bg-yellow-400 hover:text-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl hover:rotate-1 active:scale-95">
+                        <button className="bg-red-800 hover:bg-black text-white px-8 py-4 rounded-lg font-light transition-colors duration-300 border-2 border-transparent">
                           {resolvedPrimaryLabel}
                         </button>
                       </Link>
                     ) : null}
                     {resolvedSecondaryLabel ? (
                       <Link href={heroSecondaryUrl || '#'}>
-                        <button className="bg-orange-500 hover:bg-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl hover:-rotate-1 active:scale-95">
+                        <button className="bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
                           {resolvedSecondaryLabel}
                         </button>
                       </Link>
@@ -323,8 +332,8 @@ const ModernMinistryWebsite = () => {
                 ) : null}
               </>
             ) : (
-              <div className="bg-white border border-dashed border-gray-300 rounded-2xl p-8 shadow-sm animate-slide-up">
-                <p className="text-gray-500 text-lg">{emptyHeroMessage}</p>
+              <div className="bg-white border border-dashed border-gray-300 rounded-lg p-8 shadow-sm animate-slide-up">
+                <p className="text-gray-500 text-lg font-light">{emptyHeroMessage}</p>
               </div>
             )}
           </div>
@@ -332,7 +341,6 @@ const ModernMinistryWebsite = () => {
             <GallerySlider galleryImages={galleryImages} gallerySlide={gallerySlide} setGallerySlide={setGallerySlide} />
           </div>
         </section>
-
 
         {/* Stats Section */}
         <section
@@ -342,7 +350,7 @@ const ModernMinistryWebsite = () => {
             sectionsVisible.stats ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
           }`}
         >
-          <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-6 py-16 rounded-3xl shadow-lg">
+          <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-6 py-16 rounded-lg shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {stats.map((stat, index) => (
                 <div key={index} className="animate-scale-up" style={{ animationDelay: `${index * 200}ms`, animationFillMode: 'both' }}>
@@ -364,59 +372,79 @@ const ModernMinistryWebsite = () => {
           }`}
         >
           <div className="lg:col-span-2">
-            <h2 className="text-4xl font-bold text-gray-800 mb-12 animate-slide-up">{snippetText('homepage_latest_news_title', 'Latest News')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              {newsItems.slice(newsSlide * 3, (newsSlide * 3) + 3).map((news, index) => (
-                <div
-                  key={index}
-                  className="animate-fade-in-up"
-                  style={{
-                    animationDelay: `${index * 150}ms`,
-                    animationFillMode: 'both'
-                  }}
-                >
-                  <NewsCard news={news} />
-                </div>
-              ))}
+            
+            {/* NEW: Flex container to align title and buttons */}
+            <div className="flex justify-between items-center mb-12 animate-slide-up">
+              <h2 className="text-4xl font-light text-gray-800 tracking-wide">
+                {snippetText('homepage_latest_news_title', 'Latest News')}
+              </h2>
+              <div className="flex space-x-2">
+                <button className="swiper-button-prev-custom rounded-full w-10 h-10 bg-gray-200/50 hover:bg-gray-300/80 transition-colors duration-300 flex items-center justify-center">
+                  <ChevronLeft className="w-5 h-5 text-gray-800" />
+                </button>
+                <button className="swiper-button-next-custom rounded-full w-10 h-10 bg-gray-200/50 hover:bg-gray-300/80 transition-colors duration-300 flex items-center justify-center">
+                  <ChevronRight className="w-5 h-5 text-gray-800" />
+                </button>
+              </div>
             </div>
-            <div className="flex justify-center space-x-4">
-              {/* Previous Button - Matching HeroSlider Style */}
-              <button
-                onClick={() => setNewsSlide((prev) => Math.max(0, prev - 1))}
-                className="group bg-black/30 hover:bg-black/50 backdrop-blur-sm border border-white/10 text-white p-3 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50 disabled:hover:scale-100"
-                disabled={newsSlide === 0}
+
+            <div 
+              className="relative"
+              onMouseEnter={() => swiperRef.current?.autoplay.stop()}
+              onMouseLeave={() => swiperRef.current?.autoplay.start()}
+            >
+              <Swiper
+                modules={[Autoplay, Navigation]}
+                spaceBetween={32}
+                slidesPerView={1}
+                breakpoints={{
+                  768: {
+                    slidesPerView: 3,
+                  },
+                }}
+                loop={true}
+                autoplay={{
+                  delay: 5000,
+                  disableOnInteraction: false,
+                }}
+                navigation={{
+                  nextEl: '.swiper-button-next-custom',
+                  prevEl: '.swiper-button-prev-custom',
+                }}
+                onSwiper={(swiper) => {
+                  swiperRef.current = swiper;
+                }}
+                className="mySwiper"
               >
-                <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform duration-300" />
-              </button>
-              {/* Next Button - Matching HeroSlider Style */}
-              <button
-                onClick={() => setNewsSlide((prev) => Math.min(Math.floor(newsItems.length / 3) - 1, prev + 1))}
-                className="group bg-black/30 hover:bg-black/50 backdrop-blur-sm border border-white/10 text-white p-3 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50 disabled:hover:scale-100"
-                disabled={newsItems.length === 0 || newsSlide >= Math.floor(newsItems.length / 3) - 1}
-              >
-                <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
-              </button>
+                {newsItems.map((news) => (
+                  <SwiperSlide key={news.id} className="h-auto">
+                    <NewsCard news={news} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+              
             </div>
+            
             <div className="text-center mt-8">
               <Link
                 href="/news"
-                className="inline-block bg-black hover:bg-yellow-400 hover:text-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl active:scale-95"
+                className="inline-block bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300"
               >
                 {snippetText('homepage_latest_news_cta', 'View All News')}
               </Link>
             </div>
           </div>
           <div className="lg:col-span-1 animate-slide-up animation-delay-300">
-            <h2 className="text-4xl font-bold text-gray-800 mb-8">{snippetText('homepage_notices_title', 'Notices')}</h2>
-            <div className="bg-white rounded-2xl p-6 shadow-lg h-96 overflow-y-auto hover:shadow-xl transition-shadow duration-300">
+            <h2 className="text-4xl font-light text-gray-800 mb-8 tracking-wide">{snippetText('homepage_notices_title', 'Notices')}</h2>
+            <div className="bg-white rounded-lg p-6 shadow-lg h-96 overflow-y-auto hover:shadow-xl transition-shadow duration-300">
               <div className="space-y-6">
                 <NoticeCard items={notices} />
               </div>
             </div>
-            <div className="text-center mt-6">
+            <div className="text-center mt-10">
               <Link
                 href="/notices"
-                className="inline-block bg-black hover:bg-yellow-400 hover:text-black text-white px-8 py-4 rounded-full font-semibold transition-all duration-500 transform hover:scale-110 hover:shadow-2xl active:scale-95"
+                className="inline-block bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300"
               >
                 {snippetText('homepage_notices_cta', 'View All Notices')}
               </Link>
@@ -448,7 +476,7 @@ const ModernMinistryWebsite = () => {
         <section 
           id="calendar"
           data-animate
-          className={`py-20 bg-gradient-to-br from-gray-50 to-blue-50 -mx-6 px-6 transition-all duration-1000 transform ${
+          className={`py-20 transition-all duration-1000 transform ${
             sectionsVisible.calendar 
               ? 'translate-y-0 opacity-100' 
               : 'translate-y-10 opacity-0'
@@ -456,8 +484,8 @@ const ModernMinistryWebsite = () => {
         >
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
             <div className="lg:col-span-2 animate-slide-up">
-              <h2 className="text-4xl font-bold text-gray-800 mb-8">{snippetText('homepage_calendar_title', 'Calendar')}</h2>
-              <div className="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-shadow duration-500">
+              <h2 className="text-4xl font-light text-gray-800 mb-12 tracking-wide">{snippetText('homepage_calendar_title', 'Calendar')}</h2>
+              <div className="bg-white rounded-lg shadow-xl p-8 hover:shadow-2xl transition-shadow duration-500">
                 <CalendarComponent />
               </div>
             </div>
@@ -475,6 +503,7 @@ const ModernMinistryWebsite = () => {
             </div>
           </div>
         </section>
+        
       </main>
       
       <Footer />
@@ -584,28 +613,17 @@ const ModernMinistryWebsite = () => {
         .animation-delay-400 { animation-delay: 400ms; }
         .animation-delay-600 { animation-delay: 600ms; }
         .animation-delay-1000 { animation-delay: 1000ms; }
+
+        /* Fixes for Swiper layout and hover */
+        .swiper-wrapper {
+          align-items: stretch;
+        }
+        .swiper-slide {
+          height: auto;
+        }
       `}</style>
     </div>
   );
 };
 
 export default ModernMinistryWebsite;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

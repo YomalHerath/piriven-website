@@ -102,7 +102,9 @@ const AboutPage = () => {
       <MobileMenu mobileMenuOpen={mobileMenuOpen} />
       <MainNavigation />
 
-      <main className="container mx-auto px-6 py-12 flex-grow flex flex-col md:flex-row gap-8">
+      <main className="mx-auto px-6 md:px-10 py-18 flex-grow flex flex-col md:flex-row gap-8">
+
+        
         <div
           id="about-menu"
           data-animate
@@ -111,7 +113,7 @@ const AboutPage = () => {
           }`}
         >
           <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 sticky top-28">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-xl font-light text-gray-900 mb-4 flex items-center">
               {snippetText('about_nav_title', 'Ministry Overview')}
             </h2>
             <nav className="flex flex-col space-y-2">
@@ -123,8 +125,8 @@ const AboutPage = () => {
                     <button
                       key={section.slug}
                       onClick={() => setSelectedSlug(section.slug)}
-                      className={`relative flex items-center justify-start w-full px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-300 transform ${
-                        isActive ? 'text-red-800 font-extrabold scale-105' : 'text-gray-700 hover:bg-gray-100'
+                      className={`relative flex items-center justify-start w-full px-4 py-3 rounded-lg font-light text-sm transition-all duration-300 transform ${
+                        isActive ? 'text-red-800 font-light scale-105' : 'text-gray-700 hover:bg-gray-100'
                       }`}
                     >
                       <span className="flex-grow text-left">{label}</span>
@@ -151,7 +153,7 @@ const AboutPage = () => {
           }`}
         >
           <div className="text-center md:text-left mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4 animate-slide-up">
+            <h1 className="text-4xl font-light text-gray-900 mb-4 animate-slide-up">
               {sectionTitle || placeholderTitle}
             </h1>
           </div>

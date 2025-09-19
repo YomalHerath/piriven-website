@@ -64,7 +64,7 @@ const DownloadsPage = () => {
       <MainNavigation />
 
       {/* Main Content Area */}
-      <main className="container mx-auto px-6 py-12 flex-grow flex flex-col md:flex-row gap-8">
+      <main className="mx-auto px-6 md:px-10 py-18 flex-grow flex flex-col md:flex-row gap-8">
         {/* Left Side Menu (for larger screens) */}
         <div 
           id="downloads-menu"
@@ -76,7 +76,7 @@ const DownloadsPage = () => {
           }`}
         >
           <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 sticky top-28">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <h2 className="text-xl font-light text-gray-900 mb-4 flex items-center">
               Documents
             </h2>
             <nav className="flex flex-col space-y-2">
@@ -84,9 +84,9 @@ const DownloadsPage = () => {
                 <button
                   key={doc.id ?? doc.name ?? index}
                   onClick={() => setSelectedDoc(doc.name)}
-                  className={`relative flex items-center justify-start w-full px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-300 transform ${
+                  className={`relative flex items-center justify-start w-full px-4 py-3 rounded-lg font-light text-sm transition-all duration-300 transform ${
                     selectedDoc === doc.name
-                      ? 'text-red-800 font-extrabold scale-105'
+                      ? 'text-red-800 font-light scale-105'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
@@ -112,7 +112,7 @@ const DownloadsPage = () => {
         >
           {/* Section Header */}
           <div className="text-center md:text-left mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4 animate-slide-up">{selectedDoc}</h1>
+            <h1 className="text-4xl font-light text-gray-900 mb-4 animate-slide-up">{selectedDoc}</h1>
             <div className="mt-6 flex flex-wrap items-center justify-center md:justify-start space-x-4 text-sm text-gray-500 animate-slide-up animation-delay-200">
               <div className="flex items-center">
                 <FileText className="w-4 h-4 mr-1 text-red-800" />
@@ -140,16 +140,16 @@ const DownloadsPage = () => {
                 >
                   <div className={`relative h-48 bg-gray-100 flex items-center justify-center overflow-hidden`}>
                     <FileText className="w-24 h-24 text-red-800 transition-transform duration-500 group-hover:scale-110" />
-                    <div className="absolute top-4 right-4 bg-gray-800 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                    <div className="absolute top-4 right-4 bg-gray-800 text-white px-3 py-1 rounded-full text-xs font-light shadow-lg">
                       PDF
                     </div>
-                    <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 rounded-full text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 rounded-full text-xs font-lightbold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       {pdf.size}
                     </div>
                   </div>
 
                   <div className="p-6 space-y-4">
-                    <h3 className="font-bold text-gray-800 leading-tight group-hover:text-red-800 transition-colors duration-300 text-lg">
+                    <h3 className="font-light text-gray-800 leading-tight group-hover:text-red-800 transition-colors duration-300 text-lg">
                       {pdf.title || pdf.name}
                     </h3>
 
@@ -163,7 +163,7 @@ const DownloadsPage = () => {
                         <span>{pdf.department || 'Downloads'}</span>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-xs font-semibold border border-gray-200">
+                        <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-xs font-light border border-gray-200">
                           {pdf.classification || ''}
                         </span>
                       </div>
@@ -173,7 +173,7 @@ const DownloadsPage = () => {
                       href={pdf.external_url || (pdf.file?.startsWith('/media') ? mediaUrl(pdf.file) : (pdf.url || '#'))}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center w-full bg-red-800 hover:bg-red-900 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group/btn mt-6"
+                      className="flex items-center justify-center w-full bg-red-800 hover:bg-red-900 text-white font-light py-3 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 group/btn mt-6"
                     >
                       <Download className="w-5 h-5 mr-2 group-hover/btn:animate-bounce" />
                       Download PDF
@@ -187,7 +187,7 @@ const DownloadsPage = () => {
               <div className="bg-gray-100 w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
                 <FileText className="w-16 h-16 text-gray-400" />
               </div>
-              <h3 className="2xl font-bold text-gray-800 mb-4">No Documents Available</h3>
+              <h3 className="2xl font-light text-gray-800 mb-4">No Documents Available</h3>
               <p className="text-gray-600 text-lg max-w-md mx-auto">
                 Documents for this category are being prepared. Please check back later for updates.
               </p>

@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Calendar, ExternalLink, ChevronRight } from 'lucide-react';
 
-const baseClasses = 'group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2';
+const baseClasses = 'group bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2';
 
 export const NewsCard = ({ news = {} }) => {
   const href = news.href || (news.slug ? `/news/${news.slug}` : news.id ? `/news/${news.id}` : '#');
@@ -32,14 +32,14 @@ export const NewsCard = ({ news = {} }) => {
         </div>
       </div>
       <div className="p-6">
-        <h3 className="font-bold text-gray-800 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
+        <h3 className="font-bold text-gray-800 mb-3 line-clamp-2 group-hover:text-red-800 transition-colors duration-300">
           {news.title}
         </h3>
         <p className="text-sm text-gray-500 mb-4 flex items-center">
           <Calendar className="w-4 h-4 mr-2" />
           {news.time}
         </p>
-        <span className="text-blue-600 text-sm font-semibold hover:text-blue-800 transition-colors duration-300 flex items-center">
+        <span className="text-red-800 text-sm font-semibold hover:text-red-800 transition-colors duration-300 flex items-center">
           VIEW DETAIL
           <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-300" />
         </span>

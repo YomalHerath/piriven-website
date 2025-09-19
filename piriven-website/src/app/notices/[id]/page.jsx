@@ -89,42 +89,47 @@ export default function NoticeDetailPage() {
       <MobileMenu mobileMenuOpen={mobileMenuOpen} />
       <MainNavigation />
 
-      <main className="container mx-auto px-6 py-16 max-w-3xl">
-        <div className="mb-8">
-          <Link
-            href="/notices"
-            className="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800"
-          >
-            ← <span className="ml-2"><T>Back to all notices</T></span>
-          </Link>
-        </div>
-
+      <main className="container mx-auto px-6 py-16 max-w-7xl">
         {loading ? (
-          <div className="text-center text-neutral-600">
+          <div className="text-center text-neutral-600 font-light mt-16">
             <T>Loading notice…</T>
           </div>
         ) : null}
 
         {err ? (
-          <div className="text-center text-sm text-red-600">
+          <div className="text-center text-sm text-red-800 font-light mt-16">
             Error: {err}
           </div>
         ) : null}
 
         {!loading && !err && notice ? (
-          <article className="bg-white rounded-3xl shadow-xl overflow-hidden">
-            {notice.image ? (
-              <div className="relative h-64 w-full bg-neutral-200">
-                <img
-                  src={notice.image}
-                  alt={notice.title}
-                  className="absolute inset-0 h-full w-full object-cover"
-                  loading="lazy"
-                />
+          <article className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+            {/* Left Column: Image */}
+            {notice.image && (
+              <div className="md:col-span-1 mt-8 md:mt-0">
+                <div className="relative h-96 w-full overflow-hidden rounded-lg shadow-xl bg-neutral-200">
+                  <img
+                    src={notice.image}
+                    alt={notice.title}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
               </div>
-            ) : null}
-            <div className="p-8 md:p-10">
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            )}
+            
+            {/* Right Column: Text Content */}
+            <div className="md:col-span-1">
+              <div className="mb-8">
+                <Link
+                  href="/notices"
+                  className="inline-flex items-center text-sm font-light text-black hover:text-red-800 transition-colors"
+                >
+                  ← <span className="ml-2"><T>Back to all notices</T></span>
+                </Link>
+              </div>
+
+              <p className="text-xs font-light uppercase tracking-wide text-neutral-500">
                 {notice.publishedAt || <T>Undated</T>}
                 {notice.expiresAt ? (
                   <span className="ml-2 text-neutral-400">
@@ -132,16 +137,17 @@ export default function NoticeDetailPage() {
                   </span>
                 ) : null}
               </p>
-              <h1 className="mt-3 text-3xl font-extrabold text-gray-900 leading-tight">
+              <h1 className="mt-3 text-3xl md:text-4xl font-light text-gray-900 leading-tight">
                 {notice.title || <T>Untitled</T>}
               </h1>
+
               {notice.content ? (
                 <div
-                  className="mt-6 prose prose-neutral max-w-none"
+                  className="mt-8 text-gray-900 font-light"
                   dangerouslySetInnerHTML={{ __html: notice.content }}
                 />
               ) : (
-                <p className="mt-6 text-sm text-neutral-500">
+                <p className="mt-8 text-sm font-light text-neutral-500">
                   <T>Full notice content will appear here soon.</T>
                 </p>
               )}
