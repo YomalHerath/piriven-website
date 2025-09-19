@@ -74,10 +74,20 @@ export default function NoticeDetailPage() {
     const title = preferLanguage(data?.title, data?.title_si, lang) || data?.title || '';
     const content = preferLanguage(data?.content, data?.content_si, lang) || data?.content || '';
     const image = mediaUrl(data?.image);
+    const gallery = Array.isArray(data?.gallery_images)
+      ? data.gallery_images
+          .map((item, index) => ({
+            id: item?.id ?? index,
+            src: mediaUrl(item?.image),
+            caption: preferLanguage(item?.caption, item?.caption_si, lang),
+          }))
+          .filter((item) => item.src)
+      : [];
     return {
       title,
       content,
       image,
+      gallery,
       publishedAt: formatDate(data?.published_at),
       expiresAt: formatDate(data?.expires_at),
     };
@@ -153,6 +163,31 @@ export default function NoticeDetailPage() {
               )}
             </div>
           </article>
+        ) : null}
+
+        {!loading && !err && notice?.gallery?.length ? (
+          <section className="mt-16">
+            <h2 className="text-2xl font-light text-gray-900 mb-6">
+              <T>Gallery</T>
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {notice.gallery.map((item) => (
+                <figure key={item.id} className="group overflow-hidden rounded-lg shadow-lg bg-neutral-200">
+                  <img
+                    src={item.src}
+                    alt={item.caption || notice.title}
+                    className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  {item.caption ? (
+                    <figcaption className="px-4 py-3 text-sm font-light text-gray-700 bg-white">
+                      {item.caption}
+                    </figcaption>
+                  ) : null}
+                </figure>
+              ))}
+            </div>
+          </section>
         ) : null}
       </main>
 

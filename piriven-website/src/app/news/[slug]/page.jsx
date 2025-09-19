@@ -81,12 +81,22 @@ export default function NewsDetailPage() {
     const content = preferLanguage(data?.content, data?.content_si, lang) || data?.content || '';
     const excerpt = preferLanguage(data?.excerpt, data?.excerpt_si, lang) || '';
     const image = mediaUrl(data?.image);
+    const gallery = Array.isArray(data?.gallery_images)
+      ? data.gallery_images
+          .map((item, index) => ({
+            id: item?.id ?? index,
+            src: mediaUrl(item?.image),
+            caption: preferLanguage(item?.caption, item?.caption_si, lang),
+          }))
+          .filter((item) => item.src)
+      : [];
     const { date, time } = formatDateTime(data?.published_at);
     return {
       title,
       content,
       excerpt,
       image,
+      gallery,
       date,
       time,
     };
@@ -161,6 +171,31 @@ export default function NewsDetailPage() {
               </div>
             )}
           </article>
+        ) : null}
+
+        {!loading && !err && news?.gallery?.length ? (
+          <section className="mt-16">
+            <h2 className="text-2xl font-light text-gray-900 mb-6">
+              <T>Gallery</T>
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {news.gallery.map((item) => (
+                <figure key={item.id} className="group overflow-hidden rounded-lg shadow-lg bg-neutral-200">
+                  <img
+                    src={item.src}
+                    alt={item.caption || news.title}
+                    className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  {item.caption ? (
+                    <figcaption className="px-4 py-3 text-sm font-light text-gray-700 bg-white">
+                      {item.caption}
+                    </figcaption>
+                  ) : null}
+                </figure>
+              ))}
+            </div>
+          </section>
         ) : null}
       </main>
 

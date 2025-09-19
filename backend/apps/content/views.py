@@ -11,7 +11,7 @@ from . import serializers as s
 
 
 class NewsViewSet(viewsets.ModelViewSet):
-    queryset = models.News.objects.all().order_by("-published_at")
+    queryset = models.News.objects.all().prefetch_related("gallery_images").order_by("-published_at")
     serializer_class = s.NewsSerializer
     lookup_field = "slug"
     lookup_value_regex = "[0-9A-Za-z-]+"
@@ -36,7 +36,7 @@ class NewsViewSet(viewsets.ModelViewSet):
 
 
 class NoticeViewSet(viewsets.ModelViewSet):
-    queryset = models.Notice.objects.all()
+    queryset = models.Notice.objects.all().prefetch_related("gallery_images")
     serializer_class = s.NoticeSerializer
 
 
@@ -216,4 +216,3 @@ class LibraryPublicationCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = s.LibraryPublicationCategorySerializer
     filter_backends = [SearchFilter]
     search_fields = ["name", "description"]
-
