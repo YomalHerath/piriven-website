@@ -10,13 +10,16 @@ export const RightSideLink = ({ icon, text, textSi, url }) => {
       href={url || '#'} 
       target={url ? '_blank' : undefined} 
       rel={url ? 'noopener noreferrer' : undefined} 
-      className="flex items-center space-x-6 group bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300"
+      className="flex items-center space-x-3 group transition-all duration-300 transform hover:scale-105"
     >
-      <div className="flex-shrink-0 h-16 w-16 bg-transparent border-2 border-black rounded-full flex items-center justify-center group-hover:bg-gray-800 transition-colors duration-300">
-        {React.cloneElement(icon, { className: 'text-black w-6 h-6 group-hover:text-white transition-colors duration-300' })}
-      </div>
-      <span className="text-xl font-light text-gray-800 group-hover:text-red-800 transition-colors duration-300">
+      {React.cloneElement(icon, { 
+        className: 'text-gray-600 w-6 h-6 group-hover:text-red-800 transition-colors duration-300' 
+      })}
+      <span className="relative text-lg font-light text-gray-800 group-hover:text-red-800 transition-colors duration-300">
         {label}
+        <span 
+          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full h-0.5 bg-red-800 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"
+        ></span>
       </span>
     </a>
   );

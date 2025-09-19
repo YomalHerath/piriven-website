@@ -413,14 +413,14 @@ const ModernMinistryWebsite = () => {
                   <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0 animate-slide-up animation-delay-400">
                     {resolvedPrimaryLabel ? (
                       <Link href={heroPrimaryUrl}>
-                        <button className="bg-red-800 hover:bg-black text-white px-8 py-4 rounded-lg font-light transition-colors duration-300 border-2 border-transparent">
+                        <button className="cursor-pointer bg-red-800 hover:bg-black text-white px-8 py-4 rounded-lg font-light transition-colors duration-300 border-2 border-transparent">
                           {resolvedPrimaryLabel}
                         </button>
                       </Link>
                     ) : null}
                     {resolvedSecondaryLabel ? (
                       <Link href={heroSecondaryUrl}>
-                        <button className="bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
+                        <button className="cursor-pointer bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
                           {resolvedSecondaryLabel}
                         </button>
                       </Link>

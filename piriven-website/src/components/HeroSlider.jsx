@@ -165,14 +165,14 @@ export const HeroSlider = ({ mainSlides, currentSlide, setCurrentSlide }) => {
         <>
           <button
             onClick={prevSlide}
-            className="absolute left-8 top-1/2 transform -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white p-3 rounded-full transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 z-30 opacity-0 group-hover:opacity-100"
+            className="cursor-pointer absolute left-8 top-1/2 transform -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white p-3 rounded-full transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 z-30 opacity-0 group-hover:opacity-100"
             style={{ transition: 'all 0.3s cubic-bezier(0.19, 1, 0.22, 1)' }}
           >
             <ChevronLeft className="w-6 h-6 transition-transform duration-300 group-hover:-translate-x-0.5" />
           </button>
                     <button
             onClick={nextSlide}
-            className="absolute right-8 top-1/2 transform -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white p-3 rounded-full transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 z-30 opacity-0 group-hover:opacity-100"
+            className="cursor-pointer absolute right-8 top-1/2 transform -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white p-3 rounded-full transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/30 z-30 opacity-0 group-hover:opacity-100"
             style={{ transition: 'all 0.3s cubic-bezier(0.19, 1, 0.22, 1)' }}
           >
             <ChevronRight className="w-6 h-6 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -189,7 +189,7 @@ export const HeroSlider = ({ mainSlides, currentSlide, setCurrentSlide }) => {
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
-            className={`relative w-2 h-2 transition-all duration-400 ease-out transform focus:outline-none focus:ring-2 focus:ring-white/50 active:scale-90 rounded-full ${
+            className={`cursor-pointer relative w-2 h-2 transition-all duration-400 ease-out transform focus:outline-none focus:ring-2 focus:ring-white/50 active:scale-90 rounded-full ${
               index === currentSlide 
                 ? 'bg-yellow-300 scale-100 w-6 h-2' 
                 : 'bg-white/40 hover:bg-white/70'

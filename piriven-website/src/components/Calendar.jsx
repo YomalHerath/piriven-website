@@ -72,7 +72,7 @@ export const CalendarComponent = () => {
           {/* Prev Month Button */}
           <button
             onClick={handlePrevMonth}
-            className="group bg-black/5 hover:bg-black/10 backdrop-blur-sm border border-gray-200 text-black p-3 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-300"
+            className="cursor-pointer group bg-black/5 hover:bg-black/10 backdrop-blur-sm border border-gray-200 text-black p-3 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-300"
           >
             <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform duration-300" />
           </button>
@@ -82,7 +82,7 @@ export const CalendarComponent = () => {
           {/* Next Month Button */}
           <button
             onClick={handleNextMonth}
-            className="group bg-black/5 hover:bg-black/10 backdrop-blur-sm border border-gray-200 text-black p-3 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-300"
+            className="cursor-pointer group bg-black/5 hover:bg-black/10 backdrop-blur-sm border border-gray-200 text-black p-3 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-300"
           >
             <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
           </button>

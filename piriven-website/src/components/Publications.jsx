@@ -106,7 +106,7 @@ export const PublicationsSection = () => {
                       ) : null}
 
                       <div className="mt-2">
-                        <button className="bg-transparent border-2 border-white hover:bg-white text-white hover:text-black px-4 py-2 rounded-lg font-light text-xs transition-colors duration-300">
+                        <button className="cursor-pointer bg-transparent border-2 border-white hover:bg-white text-white hover:text-black px-4 py-2 rounded-lg font-light text-xs transition-colors duration-300">
                           <T>View publication</T>
                         </button>
                       </div>
@@ -121,7 +121,7 @@ export const PublicationsSection = () => {
 
       <div className="mt-12 text-center">
         <Link href="/publications">
-          <button className="inline-block bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
+          <button className="cursor-pointer inline-block bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
             <T>Browse all publications</T>
           </button>
         </Link>

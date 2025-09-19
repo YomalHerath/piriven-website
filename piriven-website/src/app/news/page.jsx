@@ -144,7 +144,7 @@ export default function NewsPage() {
 
         <div className="text-center pt-12">
           <Link href="/">
-            <button className="bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
+            <button className="cursor-pointer bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
               ← <T>Back to Home</T>
             </button>
           </Link>
