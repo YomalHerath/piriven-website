@@ -38,12 +38,12 @@ export const Footer = () => {
 
   return (
     <footer className="relative bg-gray-900 text-gray-300">
-      <div className="absolute inset-0 bg-gradient-to-tr from-red-900/40 via-yellow-900/20 to-blue-900/30 pointer-events-none" />
+      <div className="absolute inset-0 bg-black pointer-events-none" />
 
       <div className="relative container mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div>
-            <h4 className="font-bold text-xl mb-6 bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">
+            <h4 className="font-bold text-xl mb-6 bg-yellow-300 bg-clip-text text-transparent">
               {isSinhala ? 'අප ගැන' : 'About Us'}
             </h4>
             <p className="leading-relaxed text-gray-400 hover:text-gray-200 transition-colors duration-300 whitespace-pre-line">
@@ -52,7 +52,7 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-bold text-xl mb-6 bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">
+            <h4 className="font-bold text-xl mb-6 bg-yellow-300 bg-clip-text text-transparent">
               {isSinhala ? 'ඉක්මන් සබැඳි' : 'Quick Links'}
             </h4>
             <ul className="space-y-3">
@@ -75,7 +75,7 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-bold text-xl mb-6 bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">
+            <h4 className="font-bold text-xl mb-6 bg-yellow-300 bg-clip-text text-transparent">
               {isSinhala ? 'අදහස් හා විමසුම්' : 'Contact Us'}
             </h4>
             <div className="space-y-4">
@@ -83,17 +83,17 @@ export const Footer = () => {
                 {contact.organization[isSinhala ? 'si' : 'en']}
               </div>
               <div className="flex items-start space-x-3">
-                <MapPin className="w-5 h-5 mt-1 text-yellow-400" />
+                <MapPin className="w-5 h-5 mt-1 text-yellow-300" />
                 <span>{contact.address[isSinhala ? 'si' : 'en']}</span>
               </div>
               <div className="flex items-center space-x-3">
-                <Mail className="w-5 h-5 text-yellow-400" />
+                <Mail className="w-5 h-5 text-yellow-300" />
                 <a href={`mailto:${contact.email}`} className="text-gray-300 hover:text-yellow-300 transition-colors duration-300">
                   {contact.email}
                 </a>
               </div>
               <div className="flex items-center space-x-3">
-                <Phone className="w-5 h-5 text-yellow-400" />
+                <Phone className="w-5 h-5 text-yellow-300" />
                 <a href={`tel:${contact.phone}`} className="text-gray-300 hover:text-yellow-300 transition-colors duration-300">
                   {contact.phone}
                 </a>
@@ -102,10 +102,10 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-bold text-xl mb-6 bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">
+            <h4 className="font-bold text-xl mb-6 bg-yellow-300 bg-clip-text text-transparent">
               {isSinhala ? 'ස්ථානය' : 'Location'}
             </h4>
-            <div className="w-full h-32 rounded-2xl overflow-hidden shadow-lg">
+            <div className="w-full h-42 rounded-lg overflow-hidden shadow-lg">
               <iframe
                 src={contact.mapSrc}
                 width="100%"

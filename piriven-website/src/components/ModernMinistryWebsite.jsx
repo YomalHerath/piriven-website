@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 
 import { ChevronLeft, ChevronRight, BookOpen, Users, GraduationCap, Link as LinkIcon } from 'lucide-react';
@@ -23,16 +23,12 @@ import { fetchSlides, fetchNews, fetchNotices, fetchVideos, fetchStats, fetchLin
 import { useLanguage } from '@/context/LanguageContext';
 import { preferLanguage } from '@/lib/i18n';
 
-// Import Swiper React components and styles
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/autoplay';
-import 'swiper/css/navigation';
+// Swiper imports removed as per request
 
 const ModernMinistryWebsite = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [gallerySlide, setGallerySlide] = useState(0);
+  const [newsSlide, setNewsSlide] = useState(0); // Restored from the first file
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [sectionsVisible, setSectionsVisible] = useState({});
@@ -50,7 +46,6 @@ const ModernMinistryWebsite = () => {
     albums: [],
   });
 
-  const swiperRef = useRef(null);
   const {
     heroIntro,
     textSnippets,
@@ -74,7 +69,7 @@ const ModernMinistryWebsite = () => {
   const heroDescription = heroIntro ? preferLanguage(heroIntro.description, heroIntro.description_si, lang) : '';
   const heroPrimaryLabel = heroIntro ? preferLanguage(heroIntro.primary_label, heroIntro.primary_label_si, lang) : '';
   const heroSecondaryLabel = heroIntro ? preferLanguage(heroIntro.secondary_label, heroIntro.secondary_label_si, lang) : '';
-  const heroPrimaryUrl = '/hero-intro';
+  const heroPrimaryUrl = heroIntro?.primary_url || 'hero-intro';
   const heroSecondaryUrl = heroIntro?.secondary_url || '#';
 
   const fallbackHeroHeading = snippetText('home_hero_heading', '');
@@ -138,6 +133,19 @@ const ModernMinistryWebsite = () => {
       };
     });
   }, [rawNews, lang]);
+
+  // Function to get visible news items (restored)
+  const getVisibleNewsItems = () => {
+    if (newsItems.length === 0) return [];
+    if (newsItems.length <= 3) return newsItems;
+    
+    const items = [];
+    for (let i = 0; i < 3; i++) {
+      const index = (newsSlide + i) % newsItems.length;
+      items.push(newsItems[index]);
+    }
+    return items;
+  };
 
   const notices = useMemo(() => {
     if (!Array.isArray(rawNotices) || !rawNotices.length) return [];
@@ -349,6 +357,15 @@ const ModernMinistryWebsite = () => {
     return () => clearInterval(timer);
   }, [galleryImages.length]);
 
+  // Restored news carousel timer
+  useEffect(() => {
+    if (newsItems.length < 4) return;
+    const newsTimer = setInterval(() => {
+      setNewsSlide((prev) => (prev + 1) % newsItems.length);
+    }, 4000);
+    return () => clearInterval(newsTimer);
+  }, [newsItems.length]);
+  
   useEffect(() => {
     setCurrentSlide((prev) => (mainSlides.length ? Math.min(prev, mainSlides.length - 1) : 0));
   }, [mainSlides.length]);
@@ -383,7 +400,7 @@ const ModernMinistryWebsite = () => {
                   <h2 className="text-4xl md:text-5xl font-light text-gray-900 leading-tight animate-slide-up tracking-wide">
                     {resolvedHeading ? <span className="block">{resolvedHeading}</span> : null}
                     {resolvedHighlight ? (
-                      <span className="block bg-gradient-to-r from-red-500 via-blue-500 to-yellow-400 bg-clip-text text-transparent mt-2">
+                      <span className="block bg-gradient-to-r from-red-500 via-blue-500 to-yellow-400 bg-clip-text text-transparent animate-gradient-x mt-2">
                         {resolvedHighlight}
                       </span>
                     ) : null}
@@ -395,14 +412,14 @@ const ModernMinistryWebsite = () => {
                 {(resolvedPrimaryLabel || resolvedSecondaryLabel) ? (
                   <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0 animate-slide-up animation-delay-400">
                     {resolvedPrimaryLabel ? (
-                      <Link href={heroPrimaryUrl || '#'}>
+                      <Link href={heroPrimaryUrl}>
                         <button className="bg-red-800 hover:bg-black text-white px-8 py-4 rounded-lg font-light transition-colors duration-300 border-2 border-transparent">
                           {resolvedPrimaryLabel}
                         </button>
                       </Link>
                     ) : null}
                     {resolvedSecondaryLabel ? (
-                      <Link href={heroSecondaryUrl || '#'}>
+                      <Link href={heroSecondaryUrl}>
                         <button className="bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
                           {resolvedSecondaryLabel}
                         </button>
@@ -426,11 +443,11 @@ const ModernMinistryWebsite = () => {
         <section
           id="stats"
           data-animate
-          className={`py-20 transition-all duration-1000 transform ${
+          className={`py-20 transition-all duration-1000 transform -mx-6 md:-mx-10 ${
             sectionsVisible.stats ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
           }`}
         >
-          <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-6 py-16 rounded-lg shadow-lg">
+          <div className="block bg-gradient-to-r from-red-800 via-blue-500 to-yellow-400 animate-gradient-x px-6 md:px-10 py-16 shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {stats.map((stat, index) => (
                 <div key={index} className="animate-scale-up" style={{ animationDelay: `${index * 200}ms`, animationFillMode: 'both' }}>
@@ -441,7 +458,7 @@ const ModernMinistryWebsite = () => {
           </div>
         </section>
 
-        {/* News Section */}
+        {/* News Section (Restored to original logic) */}
         <section
           id="news"
           data-animate
@@ -452,57 +469,30 @@ const ModernMinistryWebsite = () => {
           }`}
         >
           <div className="lg:col-span-2">
-            
-            {/* NEW: Flex container to align title and buttons */}
-            <div className="flex justify-between items-center mb-12 animate-slide-up">
-              <h2 className="text-4xl font-light text-gray-800 tracking-wide">
-                {snippetText('homepage_latest_news_title', 'Latest News')}
-              </h2>
-              <div className="flex space-x-2">
-                <button className="swiper-button-prev-custom rounded-full w-10 h-10 bg-gray-200/50 hover:bg-gray-300/80 transition-colors duration-300 flex items-center justify-center">
-                  <ChevronLeft className="w-5 h-5 text-gray-800" />
-                </button>
-                <button className="swiper-button-next-custom rounded-full w-10 h-10 bg-gray-200/50 hover:bg-gray-300/80 transition-colors duration-300 flex items-center justify-center">
-                  <ChevronRight className="w-5 h-5 text-gray-800" />
-                </button>
-              </div>
-            </div>
-
+            <h2 className="text-4xl font-light text-gray-800 mb-12 tracking-wide animate-slide-up">
+              {snippetText('homepage_latest_news_title', 'Latest News')}
+            </h2>
             <div 
               className="relative"
-              onMouseEnter={() => swiperRef.current?.autoplay.stop()}
-              onMouseLeave={() => swiperRef.current?.autoplay.start()}
             >
-              <Swiper
-                modules={[Autoplay, Navigation]}
-                spaceBetween={32}
-                slidesPerView={1}
-                breakpoints={{
-                  768: {
-                    slidesPerView: 3,
-                  },
-                }}
-                loop={true}
-                autoplay={{
-                  delay: 5000,
-                  disableOnInteraction: false,
-                }}
-                navigation={{
-                  nextEl: '.swiper-button-next-custom',
-                  prevEl: '.swiper-button-prev-custom',
-                }}
-                onSwiper={(swiper) => {
-                  swiperRef.current = swiper;
-                }}
-                className="mySwiper"
+              <div 
+                className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(0%)` }}
               >
-                {newsItems.map((news) => (
-                  <SwiperSlide key={news.id} className="h-auto">
+                {getVisibleNewsItems().map((news, index) => (
+                  <div
+                    key={`${news.id}-${newsSlide}-${index}`}
+                    className={`transition-all duration-500 ease-out transform ${
+                      sectionsVisible.news 
+                        ? 'translate-y-0 opacity-100' 
+                        : 'translate-y-4 opacity-0'
+                    }`}
+                    style={{ transitionDelay: `${index * 100 + 200}ms` }}
+                  >
                     <NewsCard news={news} />
-                  </SwiperSlide>
+                  </div>
                 ))}
-              </Swiper>
-              
+              </div>
             </div>
             
             <div className="text-center mt-8">
