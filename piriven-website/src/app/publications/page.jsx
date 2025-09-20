@@ -31,6 +31,8 @@ export default function PublicationsPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
+  // State to track which sections are visible for animations
+  const [sectionsVisible, setSectionsVisible] = useState({});
 
   useEffect(() => {
     let ignore = false;
@@ -48,6 +50,28 @@ export default function PublicationsPage() {
       ignore = true;
     };
   }, []);
+
+  // New useEffect hook to handle the Intersection Observer for animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setSectionsVisible((prev) => ({
+              ...prev,
+              [entry.target.id]: true,
+            }));
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px' }
+    );
+
+    const targets = document.querySelectorAll('[data-animate]');
+    targets.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, [items.length]);
 
   const publications = useMemo(() => items.map((item) => {
     const title = preferLanguage(item?.title, item?.title_si, lang) || item?.title || '';
@@ -75,13 +99,19 @@ export default function PublicationsPage() {
   }), [items, lang]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col animate-fade-in">
       <Header mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       <MobileMenu mobileMenuOpen={mobileMenuOpen} />
       <MainNavigation />
 
-      <main className="container mx-auto px-6 py-16">
-        <section className="text-center mb-12">
+      <main className="container mx-auto px-6 py-16 flex-grow">
+        <section
+          id="publications-header"
+          data-animate
+          className={`text-center mb-12 transition-all duration-1000 transform ${
+            sectionsVisible['publications-header'] ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+          }`}
+        >
           <h1 className="text-4xl md:text-5xl font-light text-gray-900">
             <T>All Publications</T>
           </h1>
@@ -92,14 +122,27 @@ export default function PublicationsPage() {
         </section>
 
         {!loading && !publications.length ? (
-          <div className="text-center text-neutral-600 font-light">
+          <div
+            id="no-pubs-msg"
+            data-animate
+            className={`text-center text-neutral-600 font-light transition-all duration-1000 transform ${
+              sectionsVisible['no-pubs-msg'] ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+            }`}
+          >
             <T>No publications yet.</T>
           </div>
         ) : null}
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {publications.map((book) => (
-            <div key={book.id}>
+            <div
+              key={book.id}
+              id={`publication-${book.id}`}
+              data-animate
+              className={`transition-all duration-1000 transform ${
+                sectionsVisible[`publication-${book.id}`] ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+              }`}
+            >
               <a
                 href={book.href}
                 target={book.isExternal ? '_blank' : '_self'}
@@ -147,7 +190,13 @@ export default function PublicationsPage() {
           ))}
         </div>
 
-        <div className="text-center pt-12">
+        <div
+          id="back-to-home"
+          data-animate
+          className={`text-center pt-12 transition-all duration-1000 transform ${
+            sectionsVisible['back-to-home'] ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+          }`}
+        >
           <Link href="/">
             <button className="cursor-pointer bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
               ← <T>Back to Home</T>
@@ -157,6 +206,18 @@ export default function PublicationsPage() {
       </main>
 
       <Footer />
+      
+      {/* Add the necessary CSS keyframes for animations */}
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.8s ease-out;
+        }
+      `}</style>
     </div>
   );
 }

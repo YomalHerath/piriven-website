@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -121,12 +121,12 @@ export default function NewsDetailPage() {
   }, [data, lang]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col animate-fade-in">
       <Header mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       <MobileMenu mobileMenuOpen={mobileMenuOpen} />
       <MainNavigation />
 
-      <main className="container mx-auto px-6 py-16 max-w-7xl">
+      <main className="container mx-auto px-6 py-16 max-w-7xl flex-grow">
         {loading ? (
           <div className="text-center text-neutral-600 font-light mt-16">
             <T>Loading news…</T>
@@ -143,7 +143,7 @@ export default function NewsDetailPage() {
           <article className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
             {/* Left Column: Text Content */}
             <div className="md:col-span-1">
-              <div className="mb-8">
+              <div className="mb-8 animate-slide-up">
                 <Link
                   href="/news"
                   className="inline-flex items-center text-sm font-light text-black hover:text-red-800 transition-colors"
@@ -152,24 +152,24 @@ export default function NewsDetailPage() {
                 </Link>
               </div>
 
-              <p className="text-xs font-light uppercase tracking-wide text-neutral-500">
+              <p className="text-xs font-light uppercase tracking-wide text-neutral-500 animate-slide-up animation-delay-200">
                 {news.date}
                 {news.time ? <span className="ml-2 text-neutral-400">{news.time}</span> : null}
               </p>
-              <h1 className="mt-3 text-3xl md:text-4xl font-light text-gray-900 leading-tight">
+              <h1 className="mt-3 text-3xl md:text-4xl font-light text-gray-900 leading-tight animate-slide-up animation-delay-300">
                 {news.title || <T>Untitled</T>}
               </h1>
               {news.excerpt ? (
-                <p className="mt-4 text-base font-light text-neutral-600">{news.excerpt}</p>
+                <p className="mt-4 text-base font-light text-neutral-600 animate-slide-up animation-delay-400">{news.excerpt}</p>
               ) : null}
 
               {news.content ? (
                 <div
-                  className="mt-8 text-gray-900 font-light"
+                  className="mt-8 text-gray-900 font-light animate-slide-up animation-delay-500"
                   dangerouslySetInnerHTML={{ __html: news.content }}
                 />
               ) : (
-                <p className="mt-8 text-sm font-light text-neutral-500">
+                <p className="mt-8 text-sm font-light text-neutral-500 animate-slide-up animation-delay-500">
                   <T>Full content coming soon.</T>
                 </p>
               )}
@@ -178,7 +178,7 @@ export default function NewsDetailPage() {
             {/* Right Column: Image */}
             {news.image && (
               <div className="md:col-span-1 mt-8 md:mt-0">
-                <div className="relative h-96 w-full overflow-hidden rounded-lg shadow-xl bg-neutral-200">
+                <div className="relative h-96 w-full overflow-hidden rounded-lg shadow-xl bg-neutral-200 animate-slide-up animation-delay-600">
                   <img
                     src={news.image}
                     alt={news.title}
@@ -193,12 +193,16 @@ export default function NewsDetailPage() {
 
         {!loading && !err && news?.gallery?.length ? (
           <section className="mt-16">
-            <h2 className="text-2xl font-light text-gray-900 mb-6">
+            <h2 className="text-2xl font-light text-gray-900 mb-6 animate-slide-up animation-delay-700">
               <T>Gallery</T>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {news.gallery.map((item) => (
-                <figure key={item.id} className="group overflow-hidden rounded-lg shadow-lg bg-neutral-200">
+              {news.gallery.map((item, index) => (
+                <figure 
+                  key={item.id} 
+                  className={`group overflow-hidden rounded-lg shadow-lg bg-neutral-200 animate-slide-up`}
+                  style={{ animationDelay: `${700 + 100 * (index + 1)}ms`}}
+                >
                   <img
                     src={item.src}
                     alt={item.caption || news.title}
@@ -218,6 +222,40 @@ export default function NewsDetailPage() {
       </main>
 
       <Footer />
+      
+      {/* Add the necessary CSS keyframes for animations */}
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.8s ease-out;
+        }
+
+        .animate-slide-up {
+          animation: slide-up 0.8s ease-out;
+        }
+
+        .animation-delay-200 { animation-delay: 200ms; }
+        .animation-delay-300 { animation-delay: 300ms; }
+        .animation-delay-400 { animation-delay: 400ms; }
+        .animation-delay-500 { animation-delay: 500ms; }
+        .animation-delay-600 { animation-delay: 600ms; }
+        .animation-delay-700 { animation-delay: 700ms; }
+      `}</style>
     </div>
   );
 }

@@ -543,25 +543,24 @@ const ModernMinistryWebsite = () => {
         </section>
 
         {/* Publications and Videos Section */}
-        <section 
-          id="media"
-          data-animate
-          className={`py-20 transition-all duration-1000 transform ${
-            sectionsVisible.media 
-              ? 'translate-y-0 opacity-100' 
-              : 'translate-y-10 opacity-0'
-          }`}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-            <div className="animate-slide-left">
-              <PublicationsSection />
-            </div>
-            <div className="animate-slide-right animation-delay-300">
-              <VideosSection videos={videoList} />
-            </div>
-          </div>
-        </section>
-
+        <section
+  id="media"
+  data-animate
+  className={`py-20 transition-all duration-1000 transform ${
+    sectionsVisible.media
+      ? 'translate-y-0 opacity-100'
+      : 'translate-y-10 opacity-0'
+  }`}
+>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+    <div className="animate-slide-left">
+      <PublicationsSection />
+    </div>
+    <div className="animate-slide-right animation-delay-300">
+      <VideosSection videos={videoList} />
+    </div>
+  </div>
+</section>
         {/* Calendar and Links Section */}
         <section 
           id="calendar"

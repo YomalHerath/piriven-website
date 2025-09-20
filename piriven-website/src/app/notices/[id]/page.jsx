@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -112,20 +112,20 @@ export default function NoticeDetailPage() {
   }, [data, lang]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col animate-fade-in">
       <Header mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       <MobileMenu mobileMenuOpen={mobileMenuOpen} />
       <MainNavigation />
 
-      <main className="container mx-auto px-6 py-16 max-w-7xl">
+      <main className="container mx-auto px-6 py-16 max-w-7xl flex-grow">
         {loading ? (
-          <div className="text-center text-neutral-600 font-light mt-16">
+          <div className="text-center text-neutral-600 font-light mt-16 animate-slide-up">
             <T>Loading notice…</T>
           </div>
         ) : null}
 
         {err ? (
-          <div className="text-center text-sm text-red-800 font-light mt-16">
+          <div className="text-center text-sm text-red-800 font-light mt-16 animate-slide-up">
             Error: {err}
           </div>
         ) : null}
@@ -134,7 +134,7 @@ export default function NoticeDetailPage() {
           <article className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
             {/* Left Column: Image */}
             {notice.image && (
-              <div className="md:col-span-1 mt-8 md:mt-0">
+              <div className="md:col-span-1 mt-8 md:mt-0 animate-slide-up animation-delay-300">
                 <div className="relative h-96 w-full overflow-hidden rounded-lg shadow-xl bg-neutral-200">
                   <img
                     src={notice.image}
@@ -148,7 +148,7 @@ export default function NoticeDetailPage() {
             
             {/* Right Column: Text Content */}
             <div className="md:col-span-1">
-              <div className="mb-8">
+              <div className="mb-8 animate-slide-up">
                 <Link
                   href="/notices"
                   className="inline-flex items-center text-sm font-light text-black hover:text-red-800 transition-colors"
@@ -157,7 +157,7 @@ export default function NoticeDetailPage() {
                 </Link>
               </div>
 
-              <p className="text-xs font-light uppercase tracking-wide text-neutral-500">
+              <p className="text-xs font-light uppercase tracking-wide text-neutral-500 animate-slide-up animation-delay-100">
                 {notice.publishedAt || <T>Undated</T>}
                 {notice.expiresAt ? (
                   <span className="ml-2 text-neutral-400">
@@ -165,17 +165,17 @@ export default function NoticeDetailPage() {
                   </span>
                 ) : null}
               </p>
-              <h1 className="mt-3 text-3xl md:text-4xl font-light text-gray-900 leading-tight">
+              <h1 className="mt-3 text-3xl md:text-4xl font-light text-gray-900 leading-tight animate-slide-up animation-delay-200">
                 {notice.title || <T>Untitled</T>}
               </h1>
 
               {notice.content ? (
                 <div
-                  className="mt-8 text-gray-900 font-light"
+                  className="mt-8 text-gray-900 font-light animate-slide-up animation-delay-400"
                   dangerouslySetInnerHTML={{ __html: notice.content }}
                 />
               ) : (
-                <p className="mt-8 text-sm font-light text-neutral-500">
+                <p className="mt-8 text-sm font-light text-neutral-500 animate-slide-up animation-delay-400">
                   <T>Full notice content will appear here soon.</T>
                 </p>
               )}
@@ -185,12 +185,16 @@ export default function NoticeDetailPage() {
 
         {!loading && !err && notice?.gallery?.length ? (
           <section className="mt-16">
-            <h2 className="text-2xl font-light text-gray-900 mb-6">
+            <h2 className="text-2xl font-light text-gray-900 mb-6 animate-slide-up animation-delay-500">
               <T>Gallery</T>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {notice.gallery.map((item) => (
-                <figure key={item.id} className="group overflow-hidden rounded-lg shadow-lg bg-neutral-200">
+              {notice.gallery.map((item, index) => (
+                <figure
+                  key={item.id}
+                  className="group overflow-hidden rounded-lg shadow-lg bg-neutral-200 animate-slide-up"
+                  style={{ animationDelay: `${500 + 100 * (index + 1)}ms` }}
+                >
                   <img
                     src={item.src}
                     alt={item.caption || notice.title}
@@ -210,6 +214,39 @@ export default function NoticeDetailPage() {
       </main>
 
       <Footer />
+      
+      {/* Add the necessary CSS keyframes for animations */}
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.8s ease-out;
+        }
+
+        .animate-slide-up {
+          animation: slide-up 0.8s ease-out;
+        }
+
+        .animation-delay-100 { animation-delay: 100ms; }
+        .animation-delay-200 { animation-delay: 200ms; }
+        .animation-delay-300 { animation-delay: 300ms; }
+        .animation-delay-400 { animation-delay: 400ms; }
+        .animation-delay-500 { animation-delay: 500ms; }
+      `}</style>
     </div>
   );
 }

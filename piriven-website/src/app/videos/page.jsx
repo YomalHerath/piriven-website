@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { Play } from 'lucide-react';
 
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -18,6 +19,8 @@ export default function VideosPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
+  // State to track which sections are visible for animations
+  const [sectionsVisible, setSectionsVisible] = useState({});
 
   useEffect(() => {
     let ignore = false;
@@ -37,6 +40,28 @@ export default function VideosPage() {
     };
   }, []);
 
+  // New useEffect hook to handle the Intersection Observer for animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setSectionsVisible((prev) => ({
+              ...prev,
+              [entry.target.id]: true,
+            }));
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px' }
+    );
+
+    const targets = document.querySelectorAll('[data-animate]');
+    targets.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, [items.length]);
+
   const videos = useMemo(() => items.map((item) => {
     const title = preferLanguage(item?.title, item?.title_si, lang) || item?.title || '';
     const description = preferLanguage(item?.description, item?.description_si, lang) || '';
@@ -53,13 +78,19 @@ export default function VideosPage() {
   }), [items, lang]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col animate-fade-in">
       <Header mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       <MobileMenu mobileMenuOpen={mobileMenuOpen} />
       <MainNavigation />
 
-      <main className="container mx-auto px-6 py-16">
-        <section className="text-center mb-12">
+      <main className="container mx-auto px-6 py-16 flex-grow">
+        <section
+          id="videos-header"
+          data-animate
+          className={`text-center mb-12 transition-all duration-1000 transform ${
+            sectionsVisible['videos-header'] ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+          }`}
+        >
           <h1 className="text-4xl md:text-5xl font-light text-gray-900">
             <T>All Videos</T>
           </h1>
@@ -70,7 +101,13 @@ export default function VideosPage() {
         </section>
 
         {!loading && !videos.length ? (
-          <div className="text-center text-neutral-600 font-light">
+          <div
+            id="no-videos-msg"
+            data-animate
+            className={`text-center text-neutral-600 font-light transition-all duration-1000 transform ${
+              sectionsVisible['no-videos-msg'] ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+            }`}
+          >
             <T>No videos published yet.</T>
           </div>
         ) : null}
@@ -79,14 +116,18 @@ export default function VideosPage() {
           {videos.map((video) => (
             <article
               key={video.id}
-              className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
+              id={`video-item-${video.id}`}
+              data-animate
+              className={`bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col ${
+                sectionsVisible[`video-item-${video.id}`] ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+              }`}
             >
-              <div className="relative h-56 bg-neutral-200">
+              <div className="relative h-56 bg-neutral-200 group">
                 {video.thumbnail ? (
                   <img
                     src={video.thumbnail}
                     alt={video.title}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     loading="lazy"
                   />
                 ) : (
@@ -94,7 +135,22 @@ export default function VideosPage() {
                     <T>No thumbnail</T>
                   </div>
                 )}
+                
+                {/* Wrap the thumbnail and play button in a Link/a tag */}
+                {video.playback ? (
+                  <a
+                    href={video.playback}
+                    target={video.hasExternal ? '_blank' : '_self'}
+                    rel={video.hasExternal ? 'noreferrer' : undefined}
+                    className="absolute inset-0 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto"
+                  >
+                    <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full h-16 w-16 flex items-center justify-center group-hover:scale-125 transition-transform duration-300 border-4 border-white/30 cursor-pointer">
+                        <Play className="text-black w-6 h-6 ml-1" />
+                    </div>
+                  </a>
+                ) : null}
               </div>
+
               <div className="p-6 flex flex-col flex-1">
                 <h2 className="text-xl font-light text-gray-900 leading-snug">
                   {video.title}
@@ -103,16 +159,8 @@ export default function VideosPage() {
                   <p className="mt-3 text-sm text-neutral-600 font-light line-clamp-4">{video.description}</p>
                 ) : null}
                 <div className="mt-auto pt-6">
-                  {video.playback ? (
-                    <a
-                      href={video.playback}
-                      target={video.hasExternal ? '_blank' : '_self'}
-                      rel={video.hasExternal ? 'noreferrer' : undefined}
-                      className="inline-flex items-center text-sm font-light text-red-800"
-                    >
-                      <T>Play video</T>
-                    </a>
-                  ) : (
+                  {/* The play video link is removed as requested */}
+                  {video.playback ? null : (
                     <span className="inline-flex items-center text-sm font-light text-neutral-400">
                       <T>Video unavailable</T>
                     </span>
@@ -123,7 +171,13 @@ export default function VideosPage() {
           ))}
         </div>
 
-        <div className="text-center pt-12">
+        <div
+          id="back-to-home"
+          data-animate
+          className={`text-center pt-12 transition-all duration-1000 transform ${
+            sectionsVisible['back-to-home'] ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+          }`}
+        >
           <Link href="/">
             <button className="bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
               ← <T>Back to Home</T>
@@ -133,6 +187,18 @@ export default function VideosPage() {
       </main>
 
       <Footer />
+      
+      {/* Add the necessary CSS keyframes for animations */}
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.8s ease-out;
+        }
+      `}</style>
     </div>
   );
 }

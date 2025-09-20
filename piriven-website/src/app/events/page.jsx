@@ -52,6 +52,9 @@ export default function EventsPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
+  
+  // New state to track which sections are visible for animations
+  const [sectionsVisible, setSectionsVisible] = useState({});
 
   useEffect(() => {
     let ignore = false;
@@ -70,6 +73,28 @@ export default function EventsPage() {
       ignore = true;
     };
   }, []);
+  
+  // New useEffect hook to handle the Intersection Observer for animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setSectionsVisible((prev) => ({
+              ...prev,
+              [entry.target.id]: true,
+            }));
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px' }
+    );
+
+    const targets = document.querySelectorAll('[data-animate]');
+    targets.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, [items.length]);
 
   const events = useMemo(() => items.map((item) => {
     const title = preferLanguage(item?.title, item?.title_si, lang) || item?.title || '';
@@ -91,13 +116,19 @@ export default function EventsPage() {
   }), [items, lang]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col animate-fade-in">
       <Header mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       <MobileMenu mobileMenuOpen={mobileMenuOpen} />
       <MainNavigation />
 
-      <main className="container mx-auto px-6 py-16">
-        <section className="text-center mb-12">
+      <main className="container mx-auto px-6 py-16 flex-grow">
+        <section
+            id="events-header"
+            data-animate
+            className={`text-center mb-12 transition-all duration-1000 transform ${
+                sectionsVisible['events-header'] ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+            }`}
+        >
           <h1 className="text-4xl md:text-5xl font-light text-gray-900">
             <T>All Events</T>
           </h1>
@@ -108,7 +139,13 @@ export default function EventsPage() {
         </section>
 
         {!loading && !events.length ? (
-          <div className="text-center text-neutral-600 font-light">
+          <div
+            id="no-events"
+            data-animate
+            className={`text-center text-neutral-600 font-light transition-all duration-1000 transform ${
+                sectionsVisible['no-events'] ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+            }`}
+          >
             <T>No events scheduled yet.</T>
           </div>
         ) : null}
@@ -117,7 +154,11 @@ export default function EventsPage() {
           {events.map((event) => (
             <article
               key={event.id}
-              className="group relative bg-white transition-all duration-300 p-6 md:p-8 hover:shadow-xl border-l-2 border-gray-300 hover:border-red-800"
+              id={`event-${event.id}`}
+              data-animate
+              className={`group relative bg-white transition-all duration-300 p-6 md:p-8 hover:shadow-xl border-l-2 border-gray-300 hover:border-red-800 ${
+                  sectionsVisible[`event-${event.id}`] ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+              }`}
             >
               <div className="flex flex-wrap items-center gap-4 text-sm font-light text-neutral-500">
                 <span>
@@ -146,7 +187,13 @@ export default function EventsPage() {
           ))}
         </div>
 
-        <div className="text-center pt-12">
+        <div
+            id="back-to-home"
+            data-animate
+            className={`text-center pt-12 transition-all duration-1000 transform ${
+                sectionsVisible['back-to-home'] ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+            }`}
+        >
           <Link href="/">
             <button className="bg-transparent border-2 border-black hover:bg-black text-black hover:text-white px-8 py-4 rounded-lg font-light transition-colors duration-300">
               ← <T>Back to Home</T>
@@ -156,6 +203,33 @@ export default function EventsPage() {
       </main>
 
       <Footer />
+      
+      {/* Re-add the CSS styles for the animations */}
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.8s ease-out;
+        }
+
+        .animate-slide-up {
+          animation: slide-up 0.8s ease-out;
+        }
+      `}</style>
     </div>
   );
 }

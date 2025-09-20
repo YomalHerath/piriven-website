@@ -63,17 +63,23 @@ export const VideosSection = ({ videos }) => {
 
       <div className="space-y-6">
         {!isVideoOpen ? (
-          <button onClick={openVideo} className="block relative group rounded-lg overflow-hidden cursor-pointer w-full shadow-lg">
+          <button onClick={openVideo} className="group block relative rounded-lg overflow-hidden cursor-pointer w-full shadow-lg">
             {thumbnailPath ? (
-              <img src={thumbnailPath} alt={first?.title || "Video Thumbnail"} className="w-full h-auto object-cover" />
+              <img 
+                src={thumbnailPath} 
+                alt={first?.title || "Video Thumbnail"} 
+                className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110" 
+              />
             ) : (
               <div className="aspect-video w-full bg-gray-200 flex items-center justify-center text-gray-500">No thumbnail</div>
             )}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="rounded-full p-5 bg-black/20 backdrop-blur-sm">
-                <Play className="w-8 h-8 text-white" />
+            {/* NEW PLAY BUTTON STYLING */}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/60 transition-all duration-300">
+              <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full h-20 w-20 flex items-center justify-center group-hover:scale-125 transition-transform duration-300 border-4 border-white/30">
+                <Play className="text-black w-8 h-8 ml-1" />
               </div>
             </div>
+            {/* END OF NEW STYLING */}
           </button>
         ) : (
           <div className="relative">
