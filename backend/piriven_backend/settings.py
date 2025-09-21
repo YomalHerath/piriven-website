@@ -122,13 +122,13 @@ CSRF_TRUSTED_ORIGINS = [
 
 # ==== Jazzmin Admin customization ====
 JAZZMIN_SETTINGS = {
-    "site_title": "Piriven Admin",
-    "site_header": "Piriven Admin",
-    "site_brand": "Piriven",
+    "site_title": "Admin",
+    "site_header": "Admin",
+    "site_brand": "Admin",
     "welcome_sign": "Site Content Management",
     # Branding graphics (paths are relative to STATIC_URL)
-    "site_logo": "brand/logo_icon.png",
-    "site_icon": "brand/logo_icon.png",
+    "site_logo": None,
+    "site_icon": None,
     "copyright": "",
     "search_model": "content.News",
     "show_ui_builder": False,
@@ -195,5 +195,4 @@ JAZZMIN_UI_TWEAKS = {
         "danger": "btn btn-outline-danger",
     },
 }
-
 
